@@ -6,11 +6,13 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Tour {
@@ -25,6 +27,9 @@ public class Tour {
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "tour_event", joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
 	private Set<Event> events = new HashSet<Event>();
+
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private Guide guide;
 
 	public Tour() {
 		// TODO Auto-generated constructor stub
@@ -68,6 +73,14 @@ public class Tour {
 
 	public void setEvents(Set<Event> events) {
 		this.events = events;
+	}
+
+	public Guide getGuide() {
+		return guide;
+	}
+
+	public void setGuide(Guide guide) {
+		this.guide = guide;
 	}
 
 }

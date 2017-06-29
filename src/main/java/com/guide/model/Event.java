@@ -4,10 +4,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+
+
 
 @Entity
 public class Event {
@@ -22,6 +27,9 @@ public class Event {
 
 	@ManyToMany(mappedBy = "events")
 	private Set<Tour> tours = new HashSet<Tour>();
+	
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private Guide guide;
 
 	public Event() {
 		// TODO Auto-generated constructor stub
