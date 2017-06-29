@@ -1,10 +1,15 @@
 package com.guide.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public abstract class User {
@@ -15,6 +20,13 @@ public abstract class User {
 	private String username;
 	private String pass;
 	private Date registrationDate;
+	private boolean isBloked = false;
+
+	@OneToMany(mappedBy = "blockRequester", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	private Set<UserReport> requestedReports = new HashSet<UserReport>();
+
+	@OneToMany(mappedBy = "accused", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	private Set<UserReport> accused = new HashSet<UserReport>();
 
 	public User() {
 
@@ -50,6 +62,30 @@ public abstract class User {
 
 	public void setRegistrationDate(Date registrationDate) {
 		this.registrationDate = registrationDate;
+	}
+
+	public boolean isBloked() {
+		return isBloked;
+	}
+
+	public void setBloked(boolean isBloked) {
+		this.isBloked = isBloked;
+	}
+
+	public Set<UserReport> getRequestedReports() {
+		return requestedReports;
+	}
+
+	public void setRequestedReports(Set<UserReport> requestedReports) {
+		this.requestedReports = requestedReports;
+	}
+
+	public Set<UserReport> getAccused() {
+		return accused;
+	}
+
+	public void setAccused(Set<UserReport> accused) {
+		this.accused = accused;
 	}
 
 }
