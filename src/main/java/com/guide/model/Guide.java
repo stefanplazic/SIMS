@@ -18,7 +18,7 @@ public class Guide extends Person {
 	private Set<Tour> tours = new HashSet<Tour>();
 
 	public Guide() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public Set<Event> getEvents() {
