@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Tour {
@@ -30,6 +31,9 @@ public class Tour {
 
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Guide guide;
+
+	@OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	private Set<TouristTour> tours = new HashSet<TouristTour>();
 
 	public Tour() {
 		// TODO Auto-generated constructor stub
@@ -81,6 +85,14 @@ public class Tour {
 
 	public void setGuide(Guide guide) {
 		this.guide = guide;
+	}
+
+	public Set<TouristTour> getTours() {
+		return tours;
+	}
+
+	public void setTours(Set<TouristTour> tours) {
+		this.tours = tours;
 	}
 
 }

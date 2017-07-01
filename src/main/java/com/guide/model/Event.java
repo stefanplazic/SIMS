@@ -9,10 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-
-
+import javax.persistence.OneToOne;
 
 @Entity
 public class Event {
@@ -27,12 +27,15 @@ public class Event {
 
 	@ManyToMany(mappedBy = "events")
 	private Set<Tour> tours = new HashSet<Tour>();
-	
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Guide guide;
 
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "locationInfo_id")
+	private LocationInfo locInfo;
+
 	public Event() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public Long getId() {
@@ -81,6 +84,22 @@ public class Event {
 
 	public void setTours(Set<Tour> tours) {
 		this.tours = tours;
+	}
+
+	public Guide getGuide() {
+		return guide;
+	}
+
+	public void setGuide(Guide guide) {
+		this.guide = guide;
+	}
+
+	public LocationInfo getLocInfo() {
+		return locInfo;
+	}
+
+	public void setLocInfo(LocationInfo locInfo) {
+		this.locInfo = locInfo;
 	}
 
 }

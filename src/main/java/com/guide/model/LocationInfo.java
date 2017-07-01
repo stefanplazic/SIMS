@@ -6,6 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class LocationInfo {
@@ -19,6 +20,9 @@ public class LocationInfo {
 
 	private String adress;
 	private String postalCode;
+
+	@OneToOne(mappedBy = "locInfo")
+	private Event event;
 
 	public LocationInfo() {
 		// TODO Auto-generated constructor stub
@@ -54,6 +58,14 @@ public class LocationInfo {
 
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
+	}
+
+	public Event getEvent() {
+		return event;
+	}
+
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 
 }
