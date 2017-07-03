@@ -97,12 +97,7 @@ public class UserController {
 	public ResponseEntity<MessagesDTO> register(@RequestBody UserDTO userDTO, @PathVariable String type) {
 		MessagesDTO dto = new MessagesDTO();
 
-		/*
-		 * // if type isn't Guide or Tourist if (!type.equalsIgnoreCase("guide")
-		 * || !type.equalsIgnoreCase("tourist")) { System.out.println(type);
-		 * dto.setError("You can't make that type of user!"); return new
-		 * ResponseEntity<MessagesDTO>(dto, HttpStatus.NOT_FOUND); }
-		 */
+		
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		// check if username is already taken
 		User user = userService.findByUsername(userDTO.getUsername());
@@ -123,7 +118,7 @@ public class UserController {
 
 			// set massage
 			dto.setMessage("User of type guide created");
-			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.CREATED);
 		} else if (type.equalsIgnoreCase("tourist")) {
 			// tourist type
 			Tourist tourist = new Tourist();
@@ -137,7 +132,7 @@ public class UserController {
 			touristService.save(tourist);
 
 			dto.setMessage("User of type tourist created");
-			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.CREATED);
 		} else {
 			dto.setError(type + " type  isn't allowed!");
 			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.BAD_REQUEST);
