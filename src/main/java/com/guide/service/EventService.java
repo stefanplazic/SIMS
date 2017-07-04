@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.guide.model.Event;
+import com.guide.model.Guide;
 import com.guide.repository.EventRepository;
 
 @Service
@@ -43,6 +44,10 @@ public class EventService {
 
 	public List<Event> findByDate(Date date) {
 		return repository.findByDate(date);
+	}
+
+	public List<Event> findByGuide(Guide guide) {
+		return repository.findByGuide(guide);
 	}
 
 }
