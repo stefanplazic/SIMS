@@ -46,4 +46,8 @@ public class TouristTourService {
 		return repository.findByTour(tour);
 	}
 
+	public List<TouristTour> removeByTour(Tour tour) {
+		return repository.removeByTour(tour);
+	}
+
 }

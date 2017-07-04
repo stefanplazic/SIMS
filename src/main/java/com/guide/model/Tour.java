@@ -25,7 +25,7 @@ public class Tour {
 	private Date beginDate;
 	private Date endDate;
 
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinTable(name = "tour_event", joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"))
 	private Set<Event> events = new HashSet<Event>();
 

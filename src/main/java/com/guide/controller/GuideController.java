@@ -3,11 +3,15 @@ package com.guide.controller;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.activemq.artemis.core.persistence.impl.journal.DescribeJournal.MessageDescribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +29,7 @@ import com.guide.service.EventService;
 import com.guide.service.GuideService;
 import com.guide.service.LocationInfoService;
 import com.guide.service.TourService;
+import com.guide.service.TouristTourService;
 import com.guide.service.UserService;
 
 @RestController
@@ -45,6 +50,9 @@ public class GuideController {
 
 	@Autowired
 	private TourService tourService;
+
+	@Autowired
+	private TouristTourService touristTourService;
 
 	@RequestMapping(value = "/createEvent", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<MessagesDTO> createEvent(@RequestBody EventDTO eventDto, Principal principal) {
@@ -104,32 +112,42 @@ public class GuideController {
 
 	}
 
-	@RequestMapping(value = "/createTour", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<MessagesDTO> createTour(@RequestBody TourDTO tourDTO, Principal principal) {
+	@RequestMapping(value = "/editEvent", method = RequestMethod.PUT, consumes = "application/json")
+	public ResponseEntity<EventDTO> editEvent(Principal principal, @RequestBody EventDTO eventDTO) {
 
-		User s = userService.findByUsername(principal.getName());
-		MessagesDTO dto = new MessagesDTO();
-		if (s == null || !(s instanceof Guide)) {
-			dto.setError("You are not allowed to create events!!");
-			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.BAD_REQUEST);
-		}
+		User user = userService.findByUsername(principal.getName());
+		if (user == null)
+			return new ResponseEntity<EventDTO>(HttpStatus.UNAUTHORIZED);
 
-		Tour tour = new Tour();
-		tour.setBeginDate(tourDTO.getBeginDate());
-		tour.setEndDate(tourDTO.getEndDate());
-		tour.setName(tourDTO.getName());
-		tour.setGuide((Guide) s);
+		Event e = eventService.findOne(eventDTO.getId());
+		if (e == null || e.getGuide().getId() != user.getId())
+			return new ResponseEntity<EventDTO>(HttpStatus.BAD_REQUEST);
 
-		for (EventDTO eventDto : tourDTO.getEvents()) {
-			Event e = eventService.findOne(eventDto.getId());
-			if (e != null) {
-				tour.getEvents().add(e);// add event
-			}
+		e.setDate(eventDTO.getDate());
+		e.setDescription(eventDTO.getDescription());
+		e.setName(eventDTO.getName());
+		e.setPrice(eventDTO.getPrice());
 
-		}
-		tourService.save(tour);// save tour
+		e = eventService.save(e);
 
-		dto.setMessage("Tour saved");
-		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.CREATED);
+		return new ResponseEntity<EventDTO>(new EventDTO(e), HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/deleteEvent/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<MessagesDTO> deleteEvent(Principal principal, @PathVariable Long id) {
+		User user = userService.findByUsername(principal.getName());
+		Event e = eventService.findOne(id);
+		MessagesDTO dto = new MessagesDTO();
+		if (user == null || e.getGuide().getId() != user.getId()) {
+			dto.setError("Wrong request");
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.UNAUTHORIZED);
+		}
+
+		eventService.remove(id);
+		dto.setMessage("Event deleted.");
+		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
+	}
+
+	
+
 }
