@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.guide.dto.EventDTO;
 import com.guide.dto.MessagesDTO;
+import com.guide.dto.TourDTO;
 import com.guide.model.Event;
 import com.guide.model.Guide;
 import com.guide.model.LocationInfo;
+import com.guide.model.Tour;
 import com.guide.model.User;
 import com.guide.service.EventService;
 import com.guide.service.GuideService;
 import com.guide.service.LocationInfoService;
+import com.guide.service.TourService;
 import com.guide.service.UserService;
 
 @RestController
@@ -40,10 +43,12 @@ public class GuideController {
 	@Autowired
 	private LocationInfoService locationInfoService;
 
+	@Autowired
+	private TourService tourService;
+
 	@RequestMapping(value = "/createEvent", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<MessagesDTO> createEvent(@RequestBody EventDTO eventDto, Principal principal) {
 
-		System.out.println(principal.getName());
 		User s = userService.findByUsername(principal.getName());
 		MessagesDTO dto = new MessagesDTO();
 		if (s == null || !(s instanceof Guide)) {
@@ -97,5 +102,34 @@ public class GuideController {
 		else
 			return new ResponseEntity<List<EventDTO>>(HttpStatus.NOT_FOUND);
 
+	}
+
+	@RequestMapping(value = "/createTour", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<MessagesDTO> createTour(@RequestBody TourDTO tourDTO, Principal principal) {
+
+		User s = userService.findByUsername(principal.getName());
+		MessagesDTO dto = new MessagesDTO();
+		if (s == null || !(s instanceof Guide)) {
+			dto.setError("You are not allowed to create events!!");
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.BAD_REQUEST);
+		}
+
+		Tour tour = new Tour();
+		tour.setBeginDate(tourDTO.getBeginDate());
+		tour.setEndDate(tourDTO.getEndDate());
+		tour.setName(tourDTO.getName());
+		tour.setGuide((Guide) s);
+
+		for (EventDTO eventDto : tourDTO.getEvents()) {
+			Event e = eventService.findOne(eventDto.getId());
+			if (e != null) {
+				tour.getEvents().add(e);// add event
+			}
+
+		}
+		tourService.save(tour);// save tour
+
+		dto.setMessage("Tour saved");
+		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.CREATED);
 	}
 }
