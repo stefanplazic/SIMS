@@ -1,6 +1,8 @@
 package com.guide.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.guide.dto.LoginDTO;
 import com.guide.dto.MessagesDTO;
+import com.guide.dto.TourDTO;
 import com.guide.dto.UserDTO;
 import com.guide.model.Admin;
 import com.guide.model.Guide;
+import com.guide.model.Tour;
 import com.guide.model.Tourist;
 import com.guide.model.User;
 import com.guide.security.TokenUtils;
 import com.guide.service.GuideService;
+import com.guide.service.TourService;
 import com.guide.service.TouristService;
 import com.guide.service.UserService;
 
@@ -51,6 +56,9 @@ public class UserController {
 
 	@Autowired
 	TokenUtils tokenUtils;
+
+	@Autowired
+	private TourService tourService;
 
 	/**
 	 * Used for user login, it uses POST Method , and requires LoginDTO
@@ -97,7 +105,6 @@ public class UserController {
 	public ResponseEntity<MessagesDTO> register(@RequestBody UserDTO userDTO, @PathVariable String type) {
 		MessagesDTO dto = new MessagesDTO();
 
-		
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		// check if username is already taken
 		User user = userService.findByUsername(userDTO.getUsername());
@@ -139,4 +146,17 @@ public class UserController {
 		}
 
 	}
+
+	@RequestMapping(value = "/allTours", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<List<TourDTO>> searchTours() {
+
+		List<Tour> tours = tourService.findAll();
+		List<TourDTO> toursDto = new ArrayList<TourDTO>();
+
+		for (Tour tour : tours)
+			toursDto.add(new TourDTO(tour));
+
+		return new ResponseEntity<List<TourDTO>>(toursDto, HttpStatus.FOUND);
+	}
+
 }
