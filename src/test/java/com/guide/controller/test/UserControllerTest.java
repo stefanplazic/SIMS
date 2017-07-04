@@ -25,7 +25,6 @@ import com.guide.GuideApplication;
 import com.guide.TestUtil;
 import com.guide.dto.LoginDTO;
 import com.guide.dto.UserDTO;
-import com.guide.service.UserService;
 
 @SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -44,9 +43,6 @@ public class UserControllerTest {
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
-	@Autowired
-	private UserService userService;
-
 	@PostConstruct
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -63,7 +59,6 @@ public class UserControllerTest {
 		user.setFirstName("stefan");
 		user.setLastName("Plaza");
 		String json = TestUtil.json(user);
-		System.out.println(json);
 
 		// do mock request
 		mockMvc.perform(post(URL_PREFIX + "/register/guide").contentType(contentType).content(json))
@@ -75,7 +70,6 @@ public class UserControllerTest {
 		user.setFirstName("milos");
 		user.setLastName("Plaza");
 		json = TestUtil.json(user);
-		System.out.println(json);
 
 		mockMvc.perform(post(URL_PREFIX + "/register/tourist").contentType(contentType).content(json))
 				.andExpect(status().isConflict());
@@ -112,14 +106,16 @@ public class UserControllerTest {
 		dto.setUsername("niko");
 		dto.setPassword("admin");
 		json = TestUtil.json(dto);
-		
-		mockMvc.perform(post(URL_PREFIX + "/login").contentType(contentType).content(json)).andExpect(status().isNotFound());
-		
-		//login without username
+
+		mockMvc.perform(post(URL_PREFIX + "/login").contentType(contentType).content(json))
+				.andExpect(status().isNotFound());
+
+		// login without username
 		dto = new LoginDTO();
 		dto.setPassword("admin");
 		json = TestUtil.json(dto);
 
-		mockMvc.perform(post(URL_PREFIX + "/login").contentType(contentType).content(json)).andExpect(status().isNotFound());
+		mockMvc.perform(post(URL_PREFIX + "/login").contentType(contentType).content(json))
+				.andExpect(status().isNotFound());
 	}
 }
