@@ -65,6 +65,7 @@ public class UserControllerTest {
 		user.setLastName("Plaza");
 		String json = TestUtil.json(user);
 
+		int previusSize = userService.findAll().size(); //take the number of user
 		// do mock request
 		mockMvc.perform(post(URL_PREFIX + "/register/guide").contentType(contentType).content(json))
 				.andExpect(status().isCreated());
@@ -76,7 +77,7 @@ public class UserControllerTest {
 		user.setLastName("Plaza");
 		json = TestUtil.json(user);
 
-		int previusSize = userService.findAll().size(); //take the number of user
+		
 		
 		mockMvc.perform(post(URL_PREFIX + "/register/tourist").contentType(contentType).content(json))
 				.andExpect(status().isConflict());
