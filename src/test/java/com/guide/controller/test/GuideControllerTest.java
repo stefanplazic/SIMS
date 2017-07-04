@@ -1,10 +1,12 @@
 package com.guide.controller.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.Charset;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 
@@ -26,8 +28,11 @@ import com.guide.GuideApplication;
 import com.guide.TestUtil;
 import com.guide.dto.EventDTO;
 import com.guide.dto.LocationInfoDTO;
+import com.guide.model.Event;
 import com.guide.model.Guide;
+import com.guide.model.LocationInfo;
 import com.guide.service.EventService;
+import com.guide.service.LocationInfoService;
 import com.guide.service.UserService;
 import com.sun.security.auth.UserPrincipal;
 
@@ -53,6 +58,9 @@ public class GuideControllerTest {
 
 	@Autowired
 	private EventService eventService;
+
+	@Autowired
+	private LocationInfoService infoService;
 
 	@PostConstruct
 	public void setup() {
@@ -95,5 +103,40 @@ public class GuideControllerTest {
 
 		// check num of events
 		assertThat(eventService.findAll()).hasSize(previusSize + 1);
+	}
+
+	@Test
+	@Transactional
+	@Rollback(true)
+	public void testSearchEvents() throws Exception {
+		Guide g = new Guide();
+		g.setUsername("guide1");
+		g.setPass("guide1");
+		g.setFirstName("guide1");
+		g.setLastName("guide1");
+
+		g = (Guide) userService.save(g);// save guide
+
+		// create events
+		for (int i = 0; i < 4; i++) {
+			LocationInfo info = new LocationInfo();
+			info.setAdress("adress" + i);
+			info.setPostalCode("postal" + i);
+			info = infoService.save(info);// save info
+
+			Event e = new Event();
+			e.setDescription("desc" + i);
+			e.setDate(new Date());
+			e.setName("name" + i);
+			e.setPrice(i * 100);
+			e.setLocInfo(info);
+			e.setGuide(g);
+			eventService.save(e);// save event
+		}
+
+		// test controller
+		mockMvc.perform(get(URL_PREFIX + "/viewEvents").principal(new UserPrincipal(g.getUsername())))
+				.andExpect(status().isFound());
+
 	}
 }

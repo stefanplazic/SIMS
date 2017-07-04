@@ -73,7 +73,7 @@ public class GuideController {
 		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/viewEvents", method = RequestMethod.GET, consumes = "application/json")
+	@RequestMapping(value = "/viewEvents", method = RequestMethod.GET)
 	public ResponseEntity<List<EventDTO>> viewEvents(Principal principal) {
 
 		User u = userService.findByUsername(principal.getName());
