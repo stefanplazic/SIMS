@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.activemq.artemis.core.persistence.impl.journal.DescribeJournal.MessageDescribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -148,6 +147,95 @@ public class GuideController {
 		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
 	}
 
-	
+	@RequestMapping(value = "/createTour", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<MessagesDTO> createTour(@RequestBody TourDTO tourDTO, Principal principal) {
+
+		User s = userService.findByUsername(principal.getName());
+		MessagesDTO dto = new MessagesDTO();
+		if (s == null || !(s instanceof Guide)) {
+			dto.setError("You are not allowed to create events!!");
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.BAD_REQUEST);
+		}
+
+		Tour tour = new Tour();
+		tour.setBeginDate(tourDTO.getBeginDate());
+		tour.setEndDate(tourDTO.getEndDate());
+		tour.setName(tourDTO.getName());
+		tour.setGuide((Guide) s);
+
+		for (EventDTO eventDto : tourDTO.getEvents()) {
+			Event e = eventService.findOne(eventDto.getId());
+			if (e != null) {
+				tour.getEvents().add(e);// add event
+			}
+
+		}
+		tourService.save(tour);// save tour
+
+		dto.setMessage("Tour saved");
+		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.CREATED);
+	}
+
+	@RequestMapping(value = "/deleteTour/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<MessagesDTO> deleteTour(Principal principal, @PathVariable Long id) {
+
+		MessagesDTO dto = new MessagesDTO();
+		// check if user is logged and if hi is a guide
+		User user = userService.findByUsername(principal.getName());
+		if (user == null || !(user instanceof Guide)) {
+			dto.setError("Must be logged in!");
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.UNAUTHORIZED);
+		}
+		Tour tour = tourService.findOne(id);
+
+		System.out.println(tour.getGuide().getId());
+		if (tour == null || tour.getGuide().getId() != user.getId()) {
+			dto.setError("Wrong request!");
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.UNAUTHORIZED);
+		}
+
+		// delete from touristTour
+		touristTourService.removeByTour(tour);
+
+		// remove tour
+		tourService.remove(id);
+		dto.setMessage("Removed");
+
+		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/editTour", method = RequestMethod.PUT, consumes = "application/json")
+	public ResponseEntity<TourDTO> editTour(Principal principal, @RequestBody TourDTO tourDTO) {
+		// first check if user is logged
+		User user = userService.findByUsername(principal.getName());
+		if (user == null)
+			return new ResponseEntity<TourDTO>(HttpStatus.UNAUTHORIZED);
+
+		// check if user is owner of the tour
+		Tour tour = tourService.findOne(tourDTO.getId());
+		if (tour != null && tour.getGuide().getId() == user.getId()) {
+			tour.setBeginDate(tourDTO.getBeginDate());
+			tour.setEndDate(tourDTO.getEndDate());
+			tour.setName(tourDTO.getName());
+
+			// hashset
+			Set<Event> events = new HashSet<Event>();
+			for (EventDTO evDto : tourDTO.getEvents()) {
+
+				Event event = eventService.findOne(evDto.getId());
+				if (event != null)
+					events.add(event);
+			}
+			// set hashset to tour
+			tour.setEvents(events);
+			System.out.println(tour.getId());
+			tour = tourService.save(tour);
+
+			return new ResponseEntity<TourDTO>(new TourDTO(tour), HttpStatus.OK);
+		}
+
+		else
+			return new ResponseEntity<TourDTO>(HttpStatus.NOT_FOUND);
+	}
 
 }
