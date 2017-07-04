@@ -1,5 +1,6 @@
 package com.guide.controller.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +26,7 @@ import com.guide.GuideApplication;
 import com.guide.TestUtil;
 import com.guide.dto.LoginDTO;
 import com.guide.dto.UserDTO;
+import com.guide.service.UserService;
 
 @SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,6 +44,9 @@ public class UserControllerTest {
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
+	
+	@Autowired
+	private UserService userService;
 
 	@PostConstruct
 	public void setup() {
@@ -71,6 +76,8 @@ public class UserControllerTest {
 		user.setLastName("Plaza");
 		json = TestUtil.json(user);
 
+		int previusSize = userService.findAll().size(); //take the number of user
+		
 		mockMvc.perform(post(URL_PREFIX + "/register/tourist").contentType(contentType).content(json))
 				.andExpect(status().isConflict());
 
@@ -85,6 +92,9 @@ public class UserControllerTest {
 
 		mockMvc.perform(post(URL_PREFIX + "/register/admin").contentType(contentType).content(json))
 				.andExpect(status().isBadRequest());
+		
+		//check if num of user greater then priviusSize
+		assertThat(userService.findAll()).hasSize(previusSize + 1);
 
 	}
 
