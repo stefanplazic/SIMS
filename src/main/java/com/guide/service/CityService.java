@@ -8,36 +8,32 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.guide.model.City;
-import com.guide.model.LocationInfo;
-import com.guide.repository.LocationInfoRepository;
+import com.guide.repository.CityRepository;
 
 @Service
-public class LocationInfoService {
+public class CityService {
 
 	@Autowired
-	private LocationInfoRepository repository;
+	private CityRepository repository;
 
-	public LocationInfo findOne(Long id) {
+	public City findOne(Long id) {
 		return repository.findOne(id);
 	}
 
-	public List<LocationInfo> findAll() {
+	public List<City> findAll() {
 		return repository.findAll();
 	}
 
-	public Page<LocationInfo> findAll(Pageable page) {
+	public Page<City> findAll(Pageable page) {
 		return repository.findAll(page);
 	}
 
-	public LocationInfo save(LocationInfo info) {
-		return repository.save(info);
+	public City save(City city) {
+		return repository.save(city);
 	}
 
 	public void remove(Long id) {
 		repository.delete(id);
 	}
 
-	public List<LocationInfo> findByCity(City city) {
-		return repository.findByCity(city);
-	}
 }

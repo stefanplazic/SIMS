@@ -3,6 +3,7 @@ package com.guide.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,17 @@ import com.guide.dto.MessagesDTO;
 import com.guide.dto.TourDTO;
 import com.guide.dto.UserDTO;
 import com.guide.model.Admin;
+import com.guide.model.City;
+import com.guide.model.Event;
 import com.guide.model.Guide;
+import com.guide.model.LocationInfo;
 import com.guide.model.Tour;
 import com.guide.model.Tourist;
 import com.guide.model.User;
 import com.guide.security.TokenUtils;
+import com.guide.service.CityService;
 import com.guide.service.GuideService;
+import com.guide.service.LocationInfoService;
 import com.guide.service.TourService;
 import com.guide.service.TouristService;
 import com.guide.service.UserService;
@@ -59,6 +65,12 @@ public class UserController {
 
 	@Autowired
 	private TourService tourService;
+
+	@Autowired
+	private LocationInfoService locationInfoService;
+
+	@Autowired
+	private CityService cityService;
 
 	/**
 	 * Used for user login, it uses POST Method , and requires LoginDTO
@@ -147,7 +159,7 @@ public class UserController {
 
 	}
 
-	@RequestMapping(value = "/allTours", method = RequestMethod.GET, consumes = "application/json")
+	@RequestMapping(value = "/allTours", method = RequestMethod.GET)
 	public ResponseEntity<List<TourDTO>> searchTours() {
 
 		List<Tour> tours = tourService.findAll();
@@ -157,6 +169,28 @@ public class UserController {
 			toursDto.add(new TourDTO(tour));
 
 		return new ResponseEntity<List<TourDTO>>(toursDto, HttpStatus.FOUND);
+	}
+
+	@RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
+	public ResponseEntity<List<TourDTO>> searchbyCity(@PathVariable Long id) {
+
+		// find location infos
+		City city = cityService.findOne(id);
+		List<LocationInfo> infos = locationInfoService.findByCity(city);
+
+		// find all events
+		List<TourDTO> dtos = new ArrayList<TourDTO>();
+		for (LocationInfo info : infos) {
+			Event e = info.getEvent();
+			Set<Tour> tours = e.getTours();
+			for (Tour t : tours) {
+				TourDTO tDto = new TourDTO(t);
+				if (!dtos.contains(tDto))
+					dtos.add(tDto);
+			}
+		}
+
+		return new ResponseEntity<List<TourDTO>>(dtos, HttpStatus.FOUND);
 	}
 
 }
