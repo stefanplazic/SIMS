@@ -166,8 +166,11 @@ $("#loginForm").submit(function(e){
     success: function(data){
 
 	//set cookie
-	$.cookie('jwt',data.jwt);
-	$.cookie('role', data.rola);
+	
+	$.cookie('jwt',String(data.jwt));
+	$.cookie('role', String(data.rola));
+	localStorage.jwt = data.jwt;
+	localStorage.role = data.rola;
 
 	//redirect
 	location.reload();

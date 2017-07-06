@@ -27,7 +27,6 @@ public class AdminController {
 
 	@RequestMapping(value = "/reportedUsers", method = RequestMethod.GET)
 	public ResponseEntity<List<UserDTO>> reported(Principal principal) {
-
 		User u = userService.findByUsername(principal.getName());
 		if (!(u instanceof Admin))
 			return new ResponseEntity<List<UserDTO>>(HttpStatus.UNAUTHORIZED);
@@ -39,7 +38,7 @@ public class AdminController {
 		for (User user : reportedUsers)
 			usersDto.add(new UserDTO(user));
 
-		return new ResponseEntity<List<UserDTO>>(usersDto, HttpStatus.FOUND);
+		return new ResponseEntity<List<UserDTO>>(usersDto, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/blockUser", method = RequestMethod.POST, consumes = "application/json")
