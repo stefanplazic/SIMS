@@ -16,6 +16,7 @@ import com.guide.dto.MessagesDTO;
 import com.guide.dto.UserDTO;
 import com.guide.model.Admin;
 import com.guide.model.User;
+import com.guide.model.User.UserStates;
 import com.guide.service.UserService;
 
 @RestController
@@ -70,4 +71,60 @@ public class AdminController {
 
 		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/blockedUsers", method = RequestMethod.GET)
+	public ResponseEntity<List<UserDTO>> blockedList(Principal principal) {
+		User u = userService.findByUsername(principal.getName());
+
+		if (!(u instanceof Admin)) {
+
+			return new ResponseEntity<List<UserDTO>>(HttpStatus.UNAUTHORIZED);
+		}
+
+		List<UserDTO> usersDto = new ArrayList<UserDTO>();
+		List<User> users = userService.findByUserState(User.UserStates.Blocked);
+		for (User user : users)
+			usersDto.add(new UserDTO(user));
+
+		return new ResponseEntity<List<UserDTO>>(usersDto, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/unblock", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<MessagesDTO> unblock(Principal principal, @RequestBody UserDTO userDTO) {
+		User u = userService.findByUsername(principal.getName());
+
+		if (!(u instanceof Admin)) {
+
+			return new ResponseEntity<MessagesDTO>(HttpStatus.UNAUTHORIZED);
+		}
+
+		User us = userService.findOne(userDTO.getId());
+		if (us.getUserState() != UserStates.Blocked)
+			return new ResponseEntity<MessagesDTO>(HttpStatus.BAD_REQUEST);
+
+		// update user and save him
+		us.setUserState(UserStates.Active);
+		userService.save(us);
+		return new ResponseEntity<MessagesDTO>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/unreport", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<MessagesDTO> unreport(Principal principal, @RequestBody UserDTO userDTO) {
+		User u = userService.findByUsername(principal.getName());
+
+		if (!(u instanceof Admin)) {
+
+			return new ResponseEntity<MessagesDTO>(HttpStatus.UNAUTHORIZED);
+		}
+
+		User us = userService.findOne(userDTO.getId());
+		if (us.getUserState() != UserStates.Reported)
+			return new ResponseEntity<MessagesDTO>(HttpStatus.BAD_REQUEST);
+
+		// update user and save him
+		us.setUserState(UserStates.Active);
+		userService.save(us);
+		return new ResponseEntity<MessagesDTO>(HttpStatus.OK);
+	}
+
 }
