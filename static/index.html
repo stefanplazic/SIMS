@@ -14,6 +14,25 @@
 <body>
 <!-- TOP LOGO & MENU
 ================================================== -->
+<script>
+
+$(document).ready(function(){
+	//redirect if logged
+	if($.cookie('role') == 'ADMIN'){
+		window.location.href="admin/index.html";
+	}
+	if($.cookie('role') == 'TOURIST'){
+		window.location.href="tourist/index.html";
+	}
+
+	if($.cookie('role') == 'GUIDE'){
+		window.location.href="guide/index.html";
+	}
+});
+
+
+</script>
+
 <div class="grid">
 	<div class="row space-bot">
 		<!--Logo-->
@@ -21,31 +40,7 @@
 			<h1>GUIDE</h1>
 		</div>
 		<!--Menu-->
-		<div class="c8">
-			<nav id="topNav">
-			<ul id="responsivemenu">
-				
-				
-				<li><a href="#">Manage tours</a>
-				<ul style="display: none;">					
-					<li><a href="team.html">Create tour</a></li>
-					<li><a href="pricing.html">Edit|delete tour</a></li>
-										
-					
-				</ul>
-				</li>
-				<li><a href="#">Manage events</a>
-				<ul>
-					<li><a href="portfolio2.html">Create event</a></li>
-					<li><a href="portfolio3.html">Edit|delete event</a></li>
-					
-				</ul>
-				</li>				
-				
-				<li><a href="team.html">Logout</a></li>
-			</ul>
-			</nav>
-		</div>
+		
 	</div>
 </div>
 <div class="undermenuarea">
@@ -67,62 +62,44 @@
 		<!--INTRO-->
 		<div class="c12">
 			<div class="royalcontent">
-				<h1 class="royalheader">WELCOME</h1>
-				<h1 class="title" style="text-transform:none;">Here you can see a lot of intersting things</h1>
+				<h1 class="title" style="text-transform:none;">Welcome to login|registration page</h1>
 			</div>
 		</div>
 		<!--Box 1-->
 		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i> Responsive Theme</h2>
+			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i> Login form</h2>
 			<div class="noshadowbox">
-				<h5>DELIVERY</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
-		<!--Box 2-->
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-cog smallrightmargin"></i> Unlimited Colors</h2>
-			<div class="noshadowbox">
-				<h5>QUALITY</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
-		<!--Box 3-->
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-user" style="margin-right:10px;"></i> MultiPurpose Use</h2>
-			<div class="noshadowbox">
-				<h5>PRICING</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
+				
+				<form action="#" id="loginForm">
+			
+				<input type="text" id="username" placeholder="Username"/>
+				<input type="password" id="pass" placeholder="Password"/>
+				<input type="submit" id="loginBtn" value= "Login" class="neutralbutton"/>
+				</form>
+				
 			</div>
 		</div>
 		
+		
 		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-user" style="margin-right:10px;"></i> Something new</h2>
+			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i>Registration form</h2>
 			<div class="noshadowbox">
-				<h5>PRICING</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
+				
+				<form action="#" id="registerForm">
+			
+				<input type="text" id="usernameReg" placeholder="Your Username"/>
+				<input type="password" id="passReg" placeholder="Password"/>
+				<input type="text" id="firstname" placeholder="First name"/>
+				<input type="text" id="lastname" placeholder="Last name"/>
+				<input type="radio" name="role" value="tourist" checked > Tourist
+  				<input type="radio" name="role" value="guide" > Guide<br><br>
+				
+				<input type="submit" id="regBtn" value="Register" class="neutralbutton"/>
+				</form>
+				
 			</div>
 		</div>
+		
 	</div>
 	
 	
@@ -170,66 +147,101 @@
 <!-- END CONTENT AREA -->
 <!-- JAVASCRIPTS
 ================================================== -->
-<!-- all -->
-<script src="js/modernizr-latest.js"></script>
+
+<script>
+
+//login user
+$("#loginForm").submit(function(e){
+	e.preventDefault();
+	var username = $("#username").val();
+	var pass = $("#pass").val();
+
+	var loginDTO = {"username": username,"password":pass};
+	//use ajax 
+	$.ajax({
+	url : "http://localhost:8080/api/user/login",
+	type: "POST",
+    data: JSON.stringify(loginDTO),
+    contentType: "application/json",
+    success: function(data){
+
+	//set cookie
+	$.cookie('jwt',data.jwt);
+	$.cookie('role', data.rola);
+
+	//redirect
+	location.reload();
+        },
+    error : function(xhr, ajaxOptions, thrownError){alert("Wrong pass and username combination")}
+		});
+});
+
+//register user
+$("#registerForm").submit(function(e){
+e.preventDefault();
+var username = $("#usernameReg").val();
+var password = $("#passReg").val();
+var firstname = $("#firstname").val();
+var lastname = $("#lastname").val();
+var role = $("input[name='role']:checked").val();
+
+//check if nothing is empty
+if(username.length ==0 || password.length == 0 || firstname.length == 0 || lastname.length == 0)
+	alert("Must fill all data");
+
+else{
+	var userDto = {"username":username,
+			"pass":password,
+			"firstName": firstname,
+			"lastName": lastname
+			
+			};
+
+	//ajax request
+	$.ajax({
+		url : "http://localhost:8080/api/user/register/"+role,
+		type: "POST",
+	    data: JSON.stringify(userDto),
+	    contentType: "application/json",
+	    success: function(data){
+
+		//if all good - login
+	    	$.ajax({
+	    		url : "http://localhost:8080/api/user/login",
+	    		type: "POST",
+	    	    data: JSON.stringify({"username":username,"password":password}),
+	    	    contentType: "application/json",
+	    	    success: function(data){
+
+	    		//set cookie
+	    		$.cookie('jwt',data.jwt, { path: '/' });
+	    		$.cookie('role', data.rola, { path: '/' });
+
+	    		//redirect
+	    		location.reload();
+	    	        },
+	    	    error : function(xhr, ajaxOptions, thrownError){}
+	    			});
+		
+	        },
+	    error : function(xhr, ajaxOptions, thrownError){
+			resp = $.parseJSON(xhr.responseText);
+		    alert(resp.error);}
+			});
+
+}
+
+});
+	
+
+
+</script>
 
 <!-- menu & scroll to top -->
 <script src="js/common.js"></script>
 
-<!-- slider -->
-<script src="js/jquery.cslider.js"></script>
+<script src="js/jquery.cookie.js"></script>
 
-<!-- cycle -->
-<script src="js/jquery.cycle.js"></script>
 
-<!-- carousel items -->
-<script src="js/jquery.carouFredSel-6.0.3-packed.js"></script>
-
-<!-- twitter -->
-<script src="js/jquery.tweet.js"></script>
-
-<!-- Call Showcase - change 4 from min:4 and max:4 to the number of items you want visible -->
-<script type="text/javascript">
-$(window).load(function(){			
-			$('#recent-projects').carouFredSel({
-				responsive: true,
-				width: '100%',
-				auto: true,
-				circular	: true,
-				infinite	: false,
-				prev : {
-					button		: "#car_prev",
-					key			: "left",
-						},
-				next : {
-					button		: "#car_next",
-					key			: "right",
-							},
-				swipe: {
-					onMouse: true,
-					onTouch: true
-					},
-				scroll : 2000,
-				items: {
-					visible: {
-						min: 4,
-						max: 4
-					}
-				}
-			});
-		});	
-</script>
-
-<!-- Call opacity on hover images from carousel-->
-<script type="text/javascript">
-$(document).ready(function(){
-    $("img.imgOpa").hover(function() {
-      $(this).stop().animate({opacity: "0.6"}, 'slow');
-    },
-    function() {
-      $(this).stop().animate({opacity: "1.0"}, 'slow');
-    });
-  });
-</script>
 </body>
 </html>
