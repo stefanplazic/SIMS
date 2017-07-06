@@ -93,8 +93,13 @@ public class UserController {
 			UserDetails details = userDetailsService.loadUserByUsername(loginDTO.getUsername());
 
 			User user = userService.findByUsername(details.getUsername());
-
+			
 			MessagesDTO m = new MessagesDTO();
+			if(user.getUserState() == User.UserStates.Blocked){
+				m.setError("You are blocked");
+				return new ResponseEntity<MessagesDTO>(m, HttpStatus.BAD_REQUEST);
+			}
+			
 			m.setId(user.getId());
 			m.setJwt(tokenUtils.generateToken(details));
 

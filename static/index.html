@@ -172,7 +172,9 @@ $("#loginForm").submit(function(e){
 	//redirect
 	location.reload();
         },
-    error : function(xhr, ajaxOptions, thrownError){alert("Wrong pass and username combination")}
+    error : function(xhr, ajaxOptions, thrownError){
+    	resp = $.parseJSON(xhr.responseText);
+	    alert(resp.error);}
 		});
 });
 

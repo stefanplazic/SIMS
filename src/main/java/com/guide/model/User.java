@@ -14,13 +14,17 @@ import javax.persistence.OneToMany;
 @Entity
 public abstract class User {
 
+	public enum UserStates {
+		Active, Reported, Blocked
+	};
+
 	@Id
 	@GeneratedValue
 	private Long id;
 	private String username;
 	private String pass;
 	private Date registrationDate;
-	private boolean isBloked = false;
+	private UserStates userState = UserStates.Active;
 
 	@OneToMany(mappedBy = "blockRequester", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private Set<UserReport> requestedReports = new HashSet<UserReport>();
@@ -64,14 +68,6 @@ public abstract class User {
 		this.registrationDate = registrationDate;
 	}
 
-	public boolean isBloked() {
-		return isBloked;
-	}
-
-	public void setBloked(boolean isBloked) {
-		this.isBloked = isBloked;
-	}
-
 	public Set<UserReport> getRequestedReports() {
 		return requestedReports;
 	}
@@ -86,6 +82,14 @@ public abstract class User {
 
 	public void setAccused(Set<UserReport> accused) {
 		this.accused = accused;
+	}
+
+	public UserStates getUserState() {
+		return userState;
+	}
+
+	public void setUserState(UserStates userState) {
+		this.userState = userState;
 	}
 
 }
