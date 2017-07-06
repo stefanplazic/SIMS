@@ -1,5 +1,6 @@
 package com.guide.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +31,7 @@ import com.guide.model.City;
 import com.guide.model.Event;
 import com.guide.model.Guide;
 import com.guide.model.LocationInfo;
+import com.guide.model.Person;
 import com.guide.model.Tour;
 import com.guide.model.Tourist;
 import com.guide.model.User;
@@ -37,6 +39,7 @@ import com.guide.security.TokenUtils;
 import com.guide.service.CityService;
 import com.guide.service.GuideService;
 import com.guide.service.LocationInfoService;
+import com.guide.service.PersonService;
 import com.guide.service.TourService;
 import com.guide.service.TouristService;
 import com.guide.service.UserService;
@@ -72,6 +75,9 @@ public class UserController {
 	@Autowired
 	private CityService cityService;
 
+	@Autowired
+	private PersonService personService;
+
 	/**
 	 * Used for user login, it uses POST Method , and requires LoginDTO
 	 * 
@@ -93,13 +99,13 @@ public class UserController {
 			UserDetails details = userDetailsService.loadUserByUsername(loginDTO.getUsername());
 
 			User user = userService.findByUsername(details.getUsername());
-			
+
 			MessagesDTO m = new MessagesDTO();
-			if(user.getUserState() == User.UserStates.Blocked){
+			if (user.getUserState() == User.UserStates.Blocked) {
 				m.setError("You are blocked");
 				return new ResponseEntity<MessagesDTO>(m, HttpStatus.BAD_REQUEST);
 			}
-			
+
 			m.setId(user.getId());
 			m.setJwt(tokenUtils.generateToken(details));
 
@@ -195,7 +201,39 @@ public class UserController {
 			}
 		}
 
-		return new ResponseEntity<List<TourDTO>>(dtos, HttpStatus.FOUND);
+		return new ResponseEntity<List<TourDTO>>(dtos, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/profile/", method = RequestMethod.GET)
+	public ResponseEntity<UserDTO> profile(Principal principal) {
+
+		User user = userService.findByUsername(principal.getName());
+		if (user == null)
+			return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+
+		// reurn user data
+
+		return new ResponseEntity<UserDTO>(new UserDTO(user), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/edit", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<UserDTO> edit(Principal principal, @RequestBody UserDTO userDTO) {
+
+		User user = userService.findByUsername(principal.getName());
+		if (user == null)
+			return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+
+		// edit and save
+		Person p = (Person) user;
+		p.setFirstName(userDTO.getFirstName());
+		p.setLastName(userDTO.getLastName());
+		if (userDTO.getPass() != null) {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+			p.setPass(encoder.encode(userDTO.getPass()));
+		}
+
+		p = personService.save(p);
+		
+		return new ResponseEntity<UserDTO>(new UserDTO(user), HttpStatus.OK);
+	}
 }
