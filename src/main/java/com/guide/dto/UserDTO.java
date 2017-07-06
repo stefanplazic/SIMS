@@ -2,6 +2,9 @@ package com.guide.dto;
 
 import java.util.Date;
 
+import com.guide.model.Person;
+import com.guide.model.User;
+
 public class UserDTO {
 
 	private Long id;
@@ -13,6 +16,14 @@ public class UserDTO {
 
 	public UserDTO() {
 
+	}
+	
+	public UserDTO(User user) {
+		this.id = user.getId();
+		this.username = user.getUsername();
+		this.registrationDate = user.getRegistrationDate();
+		this.firstName = ((Person) user).getFirstName();
+		this.lastName = ((Person) user).getLastName();
 	}
 
 	public Long getId() {

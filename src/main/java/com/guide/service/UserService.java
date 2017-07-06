@@ -15,7 +15,7 @@ public class UserService {
 
 	@Autowired
 	private UserRepository repository;
-	
+
 	public User findOne(Long id) {
 		return repository.findOne(id);
 	}
@@ -38,5 +38,9 @@ public class UserService {
 
 	public User findByUsername(String username) {
 		return repository.findByUsername(username);
+	}
+
+	public List<User> findByUserState(User.UserStates userState) {
+		return repository.findByUserState(userState);
 	}
 }
