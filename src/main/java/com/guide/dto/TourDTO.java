@@ -1,5 +1,6 @@
 package com.guide.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,10 @@ public class TourDTO {
 	private Date beginDate;
 	private Date endDate;
 	private List<EventDTO> events = new ArrayList<EventDTO>();
+	private boolean isActive = false;
+	private String bgDate;
+	private String enDate;
+	
 
 	public TourDTO() {
 
@@ -27,6 +32,12 @@ public class TourDTO {
 		for (Event e : tour.getEvents()) {
 			this.events.add(new EventDTO(e));
 		}
+		if (beginDate.compareTo(new Date()) > 0)
+			this.isActive = true;
+		//format dates
+		SimpleDateFormat endFor = new SimpleDateFormat(" dd/MM/yyyy");
+		this.bgDate = endFor.format(beginDate);
+		this.enDate = endFor.format(endDate);
 	}
 
 	public Long getId() {
@@ -68,5 +79,31 @@ public class TourDTO {
 	public void setEvents(List<EventDTO> events) {
 		this.events = events;
 	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public String getBgDate() {
+		return bgDate;
+	}
+
+	public void setBgDate(String bgDate) {
+		this.bgDate = bgDate;
+	}
+
+	public String getEnDate() {
+		return enDate;
+	}
+
+	public void setEnDate(String enDate) {
+		this.enDate = enDate;
+	}
+
+	
 
 }

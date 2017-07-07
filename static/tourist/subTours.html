@@ -57,27 +57,166 @@
 </div>
 <!-- START content area
 ================================================== -->
+<script>
+	$(document).ready(function(){
+		$.ajax({
+
+			url : "http://localhost:8080/api/tourist/tours/",
+			type: "GET",
+			headers: {"Authorization": localStorage.jwt},
+			success: function(data){
+
+				var table = document.createElement('TABLE');
+
+				$.each(data,function(i,item){
+
+					var row = document.createElement('TR');
+					var celU = document.createElement('TD');
+					var celB = document.createElement('TD');
+					var celS = document.createElement('TD');
+					var celE = document.createElement('TD');
+					var celD = document.createElement('TD');
+					var celT = document.createElement('TD');
+					
+					var buttonU = document.createElement('BUTTON');
+					buttonU.appendChild(document.createTextNode('Unsubscribe'));
+
+					buttonU.onclick = function(){
+						//ajax call
+						$.ajax({
+			  				url: "http://localhost:8080/api/tourist/unsubscribe",
+			  				type: 'POST',
+			  				headers: {"Authorization": localStorage.jwt},
+			  				data: JSON.stringify({"id":item.id}),
+			  			    contentType: "application/json",
+			  			    success: function(data){location.reload();}
+			  			    });
+
+						};
+					
+					celU.appendChild(document.createTextNode(item.name));
+					celB.appendChild(document.createTextNode(item.bgDate));
+					celS.appendChild(document.createTextNode(item.enDate));
+					celD.appendChild(document.createTextNode(item.events.length));
+
+					if(item.active){
+						celT.appendChild(buttonU);
+						}
+					
+
+					//append to row
+					row.appendChild(celU);
+					row.appendChild(celB);
+					row.appendChild(celS);
+					
+					row.appendChild(celT);
+					
+					//append row to table
+					table.appendChild(row);
+					});
+
+				document.getElementById('contentDiv').appendChild(table);
+				},
+			error: function(xhr, ajaxOptions, thrownError){}
+			});
+
+		//ajax
+		//
+		$.ajax({
+
+			url : "http://localhost:8080/api/user/cities",
+			type: "GET",
+			headers: {"Authorization": localStorage.jwt},
+			success: function(data){
+				var box = $("#searchSel");
+				$.each(data,function(i,item){
+					box.append($("<option />").val(item.id).text(item.name));
+					});
+				}});
+
+		//change function
+		
+		$("#searchSel").change(function(){
+			$.ajax({
+
+				url : "http://localhost:8080/api/user/search/"+$("#searchSel").val(),
+				type: "GET",
+				headers: {"Authorization": localStorage.jwt},
+				success: function(data){
+					$.each(data,function(i,item){
+						var searchD = document.createElement('DIV');
+						searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Tour name: "+item.name)));
+						searchD.appendChild(document.createElement("br"));
+						searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Begin date: "+item.bgDate)));
+						searchD.appendChild(document.createElement("br"));
+						searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("End date:" +item.bgDate)));
+						searchD.appendChild(document.createElement("br"));
+
+						searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Events:")));
+						searchD.appendChild(document.createElement("hr"));
+						
+						$.each(item.events,function(i,ev){
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode(" name:" + ev.name)));
+							searchD.appendChild(document.createElement("br"));
+
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Desc:" + ev.description)));
+							searchD.appendChild(document.createElement("br"));
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Price:" + ev.price)));
+							searchD.appendChild(document.createElement("br"));
+
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Address:" + ev.info.adress)));
+							searchD.appendChild(document.createElement("br"));
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Postal Code:" + ev.info.postalCode)));
+							searchD.appendChild(document.createElement("br"));
+							searchD.appendChild(document.createElement("hr"));
+							});
+
+						if(item.active){
+								var dugme = document.createElement("BUTTON");
+								dugme.appendChild(document.createTextNode("Subsribe"));
+								dugme.onclick = function(){
+									//applay
+
+									$.ajax({
+						  				url: "http://localhost:8080/api/tourist/applay",
+						  				type: 'POST',
+						  				headers: {"Authorization": localStorage.jwt},
+						  				data: JSON.stringify({"id":item.id}),
+						  			    contentType: "application/json",
+						  			    success: function(data){location.reload();}
+						  			    });
+									};
+								searchD.appendChild(dugme);
+								searchD.appendChild(document.createElement("br"));
+							}
+						$("#searchTours").append(searchD);
+					
+						
+						});
+					}});
+			});
+		});
+</script>
+
 <div class="grid">
 	<div class="row space-bot">
 		<!--INTRO-->
 		<div class="c12">
 			<div class="royalcontent">
 				<h1 class="royalheader">WELCOME</h1>
-				<h1 class="title" style="text-transform:none;">Here you can see a lot of intersting things</h1>
+				<h1 class="title" style="text-transform:none;">Subscribed tours</h1>
 			</div>
 		</div>
-		<!--Box 1-->
-		<div class="c4" >
-			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i> Profile data</h2>
-			<div class="noshadowbox">
-				<h5>Edit</h5>
-				<input type='text' id="username" placeholder="Username" readOnly style=" background-color:#ccc;"/>
-				<input type='text' id="firstname" placeholder="First name"/>
-				<input type='text' id="lastname" placeholder="Last name"/>
-				<input type='password' id="password" placeholder="Password"/>
-				<input type='password' id="passwordRep" placeholder="Repat password"/>
-				<input type="button" id="editBtn" value="Edit" class="neutralbutton"/>
-			</div>
+		
+		<div id="contentDiv">
+			<!-- our tours goes here -->
+		</div>
+		
+		<div id="searchTours">
+		<h2>Search tours</h2>
+			<!-- our tours goes here -->
+			<select id="searchSel">
+			</select>
 		</div>
 		
 	</div>

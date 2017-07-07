@@ -1,6 +1,7 @@
 package com.guide.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -94,6 +95,12 @@ public class TouristController {
 			dto.setError("Tour doesn't exists");
 			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.NOT_FOUND);
 		}
+		
+		else if(tourDTO.isActive()){
+			dto.setError("Tour allready started!");
+			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.BAD_REQUEST);
+		}
+			
 		// already applaied
 		for (TouristTour tt : t) {
 			if (tt.getTour() == tour) {
@@ -107,6 +114,22 @@ public class TouristController {
 		dto.setError("YOu are not subscribed");
 
 		return new ResponseEntity<MessagesDTO>(dto, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/tours", method = RequestMethod.GET)
+	public ResponseEntity<List<TourDTO>> tours(Principal principal) {
+
+		User u = userService.findByUsername(principal.getName());
+		if (u == null || !(u instanceof Tourist))
+			return new ResponseEntity<List<TourDTO>>(HttpStatus.UNAUTHORIZED);
+
+		// get all tours
+		List<TouristTour> touristTours = touristTourService.findByTourist((Tourist) u);
+		List<TourDTO> dtos = new ArrayList<TourDTO>();
+
+		for (TouristTour touristTour : touristTours)
+			dtos.add(new TourDTO(touristTour.getTour()));
+		return new ResponseEntity<List<TourDTO>>(dtos, HttpStatus.OK);
 	}
 
 }

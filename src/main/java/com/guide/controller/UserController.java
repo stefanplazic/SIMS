@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.guide.dto.CityDTO;
 import com.guide.dto.LoginDTO;
 import com.guide.dto.MessagesDTO;
 import com.guide.dto.TourDTO;
@@ -233,7 +234,17 @@ public class UserController {
 		}
 
 		p = personService.save(p);
-		
+
 		return new ResponseEntity<UserDTO>(new UserDTO(user), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/cities", method = RequestMethod.GET)
+	public ResponseEntity<List<CityDTO>> cities() {
+		List<CityDTO> dto = new ArrayList<CityDTO>();
+		List<City> c = cityService.findAll();
+		for (City city : c)
+			dto.add(new CityDTO(city));
+
+		return new ResponseEntity<List<CityDTO>>(dto, HttpStatus.OK);
 	}
 }
