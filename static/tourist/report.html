@@ -15,66 +15,12 @@
 <!-- TOP LOGO & MENU
 ================================================== -->
 
-<script>
-$(document).ready(function(){
-	$.ajax({
-
-		url : "http://localhost:8080/api/guide/viewEvents",
-		type: "GET",
-		headers: {"Authorization": localStorage.jwt},
-		success: function(data){
-
-			$.each(data,function(i,item){
-					$("#events").append("<input type='checkbox' name='event[]' value='"+item.id+"'/> "+item.name+"<br>");
-				});
-			
-			},
-			error : function(xhr, ajaxOptions, thrownError){
-		    	resp = $.parseJSON(xhr.responseText);
-			    console.log("error");}
-		    });
-
-	$("#but").click(function(){
-			var event={};
-			
-			
-	
-	event["name"] = $('#evname').val();
-	event["beginDate"] = $('#begdat').val();
-	event["endDate"] = $('#enddat').val();
-	 event["events"] = [];
-	var checkbox  = document.getElementsByName('event[]');
-	console.log(checkbox.length);
-	for(var i=0; i< checkbox.length; i++) {
-	    
-	        event["events"].push({"id": checkbox[i].value})
-	}
-	console.log(event);
-
-	//ajax create event
-	
-	$.ajax({
-
-		url : "http://localhost:8080/api/guide/createTour",
-		type: "POST",
-		headers: {"Authorization": localStorage.jwt},
-		data: JSON.stringify(event),
-	    contentType: "application/json",
-		success: function(data){
-			alert("Radi");
-			}});
-	});
-	
-
-});
-</script>
-
 
 <div class="grid">
 	<div class="row space-bot">
 		<!--Logo-->
 		<div class="c4">
-			<h1>GUIDE</h1>
+			<h1>TOURIST</h1>
 		</div>
 		<!--Menu-->
 		<div class="c8">
@@ -82,14 +28,16 @@ $(document).ready(function(){
 			<ul id="responsivemenu">
 				
 				
-				<li><a href="toursmanage.html">Manage tours</a>
+				<li><a href="subTours.html">Subscribed tours</a>
 				
 				</li>
-				<li><a href="eventsmanage.html">Manage events</a>
+				
+				
+				<li><a href="profile.html">Profile</a>
 				
 				</li>				
-				
-				<li><a href="#" id="logoutLink">Logout</a></li>
+				<li><a href="report.html">Report users</a></li>
+				<li><a id="logoutLink">Logout</a></li>
 			</ul>
 			</nav>
 		</div>
@@ -109,42 +57,86 @@ $(document).ready(function(){
 </div>
 <!-- START content area
 ================================================== -->
+<script>
+	$(document).ready(function(){
+		$.ajax({
+
+			url : "http://localhost:8080/api/tourist/all",
+			type: "GET",
+			headers: {"Authorization": localStorage.jwt},
+			success: function(data){
+
+				var table = document.createElement('TABLE');
+
+				$.each(data,function(i,item){
+
+					var row = document.createElement('TR');
+					var celU = document.createElement('TD');
+					var celB = document.createElement('TD');
+					var celS = document.createElement('TD');
+					var celE = document.createElement('TD');
+					
+					
+					var buttonU = document.createElement('BUTTON');
+					buttonU.appendChild(document.createTextNode('Report user'));
+
+					buttonU.onclick = function(){
+						//ajax call
+						$.ajax({
+			  				url: "http://localhost:8080/api/tourist/report/"+item.id,
+			  				type: 'GET',
+			  				headers: {"Authorization": localStorage.jwt},
+			  				
+			  			    success: function(data){location.reload();}
+			  			    });
+
+						};
+					
+					celU.appendChild(document.createTextNode(item.username));
+					celB.appendChild(document.createTextNode(item.firstName));
+					celS.appendChild(document.createTextNode(item.firstName));
+					celE.appendChild(buttonU);
+
+					if(item.active){
+						celT.appendChild(buttonU);
+						}
+					
+
+					//append to row
+					row.appendChild(celU);
+					row.appendChild(celB);
+					row.appendChild(celS);
+					
+					row.appendChild(celE);
+					
+					table.appendChild(row);
+					});
+
+				document.getElementById('contentDiv').appendChild(table);
+				},
+			error: function(xhr, ajaxOptions, thrownError){}
+			});
+
+	
+		});
+</script>
+
 <div class="grid">
 	<div class="row space-bot">
 		<!--INTRO-->
 		<div class="c12">
 			<div class="royalcontent">
 				<h1 class="royalheader">WELCOME</h1>
-				<h1 class="title" style="text-transform:none;">Here you can see a lot of intersting things</h1>
+				<h1 class="title" style="text-transform:none;">Subscribed tours</h1>
 			</div>
 		</div>
 		
-		<div id="newEvent">
-		<table>
-			<tr>
-				<td> name</td>
-				<td>begin date</td>
-				<td>end date</td>
-				
-				<td></td>
-			</tr>
-			<tr>
-			<td><input type="text" id="evname"/></td>
-				
-				
-				<td><input type='date' id ="begdat"/></td>
-				<td><input type='date' id ="enddat"/></td>
-				<td><input type="button" id="but" value="Create"/></td>
-			</tr>
-		</table>
-	</div>
-	
-	
-		<div id="events"></div>
-		
-		<div id="mytours">
-			
+		<div id="contentDiv">
+			<!-- our tours goes here -->
+			<h1>List of all users</h1>
 		</div>
+		
+		
 		
 	</div>
 	
@@ -197,7 +189,6 @@ $(document).ready(function(){
 
 <!-- menu & scroll to top -->
 <script src="../js/common.js"></script>
-
 
 <script src="../js/logout.js"></script>
 <script src="../js/jquery.cookie.js"></script>

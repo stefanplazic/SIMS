@@ -36,7 +36,7 @@
 				<li><a href="profile.html">Profile</a>
 				
 				</li>				
-				
+				<li><a href="report.html">Report users</a></li>
 				<li><a id="logoutLink">Logout</a></li>
 			</ul>
 			</nav>
@@ -143,6 +143,8 @@
 				type: "GET",
 				headers: {"Authorization": localStorage.jwt},
 				success: function(data){
+					$("#searchTours").empty();
+					
 					$.each(data,function(i,item){
 						var searchD = document.createElement('DIV');
 						searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Tour name: "+item.name)));
@@ -212,11 +214,12 @@
 			<!-- our tours goes here -->
 		</div>
 		
+		<select id="searchSel">
+			</select>
 		<div id="searchTours">
 		<h2>Search tours</h2>
 			<!-- our tours goes here -->
-			<select id="searchSel">
-			</select>
+			
 		</div>
 		
 	</div>

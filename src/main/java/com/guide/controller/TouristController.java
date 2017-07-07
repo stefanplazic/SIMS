@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.guide.dto.MessagesDTO;
 import com.guide.dto.TourDTO;
+import com.guide.dto.UserDTO;
+import com.guide.model.Admin;
 import com.guide.model.Tour;
 import com.guide.model.Tourist;
 import com.guide.model.TouristTour;
 import com.guide.model.User;
+import com.guide.model.User.UserStates;
 import com.guide.service.TourService;
 import com.guide.service.TouristTourService;
 import com.guide.service.UserService;
@@ -95,12 +99,12 @@ public class TouristController {
 			dto.setError("Tour doesn't exists");
 			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.NOT_FOUND);
 		}
-		
-		else if(tourDTO.isActive()){
+
+		else if (tourDTO.isActive()) {
 			dto.setError("Tour allready started!");
 			return new ResponseEntity<MessagesDTO>(dto, HttpStatus.BAD_REQUEST);
 		}
-			
+
 		// already applaied
 		for (TouristTour tt : t) {
 			if (tt.getTour() == tour) {
@@ -132,4 +136,33 @@ public class TouristController {
 		return new ResponseEntity<List<TourDTO>>(dtos, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/all", method = RequestMethod.GET)
+	public ResponseEntity<List<UserDTO>> all(Principal principal) {
+		User me = userService.findByUsername(principal.getName());
+		if(me == null)
+			return new ResponseEntity<List<UserDTO>>( HttpStatus.UNAUTHORIZED);
+		
+		List<User> users = userService.findAll();
+		List<UserDTO> dtos = new ArrayList<UserDTO>();
+		
+		for (User u : users)
+			if (!(u instanceof Admin) && u.getUserState() != UserStates.Blocked && u.getUserState() != UserStates.Reported && me != u)
+				dtos.add(new UserDTO(u));
+
+		return new ResponseEntity<List<UserDTO>>(dtos, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/report/{id}", method = RequestMethod.GET)
+	public ResponseEntity<MessagesDTO> report(Principal principal, @PathVariable Long id) {
+
+		User u = userService.findByUsername(principal.getName());
+		if (u == null)
+			return new ResponseEntity<MessagesDTO>(HttpStatus.UNAUTHORIZED);
+
+		u = userService.findOne(id);
+		u.setUserState(UserStates.Reported);
+		userService.save(u);
+
+		return new ResponseEntity<MessagesDTO>(HttpStatus.OK);
+	}
 }
