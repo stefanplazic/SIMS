@@ -108,7 +108,7 @@ public class GuideController {
 			}
 
 			// return eventsDto
-			return new ResponseEntity<List<EventDTO>>(eventsDto, HttpStatus.FOUND);
+			return new ResponseEntity<List<EventDTO>>(eventsDto, HttpStatus.OK);
 		}
 
 		// if not type of guide

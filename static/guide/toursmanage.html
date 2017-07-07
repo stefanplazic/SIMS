@@ -15,6 +15,60 @@
 <!-- TOP LOGO & MENU
 ================================================== -->
 
+<script>
+$(document).ready(function(){
+	$.ajax({
+
+		url : "http://localhost:8080/api/guide/viewEvents",
+		type: "GET",
+		headers: {"Authorization": localStorage.jwt},
+		success: function(data){
+
+			$.each(data,function(i,item){
+					$("#events").append("<input type='checkbox' name='event[]' value='"+item.id+"'/> "+item.name+"<br>");
+				});
+			
+			},
+			error : function(xhr, ajaxOptions, thrownError){
+		    	resp = $.parseJSON(xhr.responseText);
+			    console.log("error");}
+		    });
+
+	$("#but").click(function(){
+			var event={};
+			
+			
+	
+	event["name"] = $('#evname').val();
+	event["beginDate"] = $('#begdat').val();
+	event["endDate"] = $('#enddat').val();
+	 event["events"] = [];
+	var checkbox  = document.getElementsByName('event[]');
+	console.log(checkbox.length);
+	for(var i=0; i< checkbox.length; i++) {
+	    
+	        event["events"].push({"id": checkbox[i].value})
+	}
+	console.log(event);
+
+	//ajax create event
+	
+	$.ajax({
+
+		url : "http://localhost:8080/api/guide/createTour",
+		type: "POST",
+		headers: {"Authorization": localStorage.jwt},
+		data: JSON.stringify(event),
+	    contentType: "application/json",
+		success: function(data){
+			alert("Radi");
+			}});
+	});
+	
+
+});
+</script>
+
 
 <div class="grid">
 	<div class="row space-bot">
@@ -65,20 +119,28 @@
 			</div>
 		</div>
 		
-		<!--Box 3-->
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-user" style="margin-right:10px;"></i> MultiPurpose Use</h2>
-			<div class="noshadowbox">
-				<h5>PRICING</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
-		
+		<div id="newEvent">
+		<table>
+			<tr>
+				<td> name</td>
+				<td>begin date</td>
+				<td>end date</td>
+				
+				<td></td>
+			</tr>
+			<tr>
+			<td><input type="text" id="evname"/></td>
+				
+				
+				<td><input type='date' id ="begdat"/></td>
+				<td><input type='date' id ="enddat"/></td>
+				<td><input type="button" id="but" value="Create"/></td>
+			</tr>
+		</table>
+	</div>
+	
+	
+		<div id="events"></div>
 		
 	</div>
 	
