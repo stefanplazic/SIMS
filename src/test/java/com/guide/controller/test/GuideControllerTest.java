@@ -1,6 +1,7 @@
 package com.guide.controller.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,9 +29,11 @@ import com.guide.GuideApplication;
 import com.guide.TestUtil;
 import com.guide.dto.EventDTO;
 import com.guide.dto.LocationInfoDTO;
+import com.guide.model.City;
 import com.guide.model.Event;
 import com.guide.model.Guide;
 import com.guide.model.LocationInfo;
+import com.guide.service.CityService;
 import com.guide.service.EventService;
 import com.guide.service.LocationInfoService;
 import com.guide.service.UserService;
@@ -62,6 +65,9 @@ public class GuideControllerTest {
 	@Autowired
 	private LocationInfoService infoService;
 
+	@Autowired
+	private CityService cityService;
+
 	@PostConstruct
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -76,7 +82,7 @@ public class GuideControllerTest {
 		Guide guide = new Guide();
 		guide.setFirstName("Milos");
 		guide.setLastName("Petrovic");
-		guide.setUsername("milos");
+		guide.setUsername("some");
 		guide.setPass("somePass");
 
 		// save guide
@@ -93,12 +99,17 @@ public class GuideControllerTest {
 		infoDTO.setPostalCode("110000");
 		dto.setInfo(infoDTO);
 
+		// city
+		City city = new City();
+		city.setName("Zemun");
+		city = cityService.save(city);
+
 		String json = TestUtil.json(dto);
 
 		int previusSize = eventService.findAll().size();
 
 		// do mock request
-		mockMvc.perform(post(URL_PREFIX + "/createEvent").contentType(contentType).content(json)
+		mockMvc.perform(post(URL_PREFIX + "/createEvent/" + city.getId()).contentType(contentType).content(json)
 				.principal(new UserPrincipal(guide.getUsername()))).andExpect(status().isCreated());
 
 		// check num of events
@@ -136,7 +147,44 @@ public class GuideControllerTest {
 
 		// test controller
 		mockMvc.perform(get(URL_PREFIX + "/viewEvents").principal(new UserPrincipal(g.getUsername())))
-				.andExpect(status().isFound());
+				.andExpect(status().isOk());
 
 	}
+
+	@Test
+	@Transactional
+	@Rollback(true)
+	public void testdeleteEvent() throws Exception {
+		Guide g = new Guide();
+		g.setUsername("guide1");
+		g.setPass("guide1");
+		g.setFirstName("guide1");
+		g.setLastName("guide1");
+
+		g = (Guide) userService.save(g);// save guide
+
+		// create events
+		Event e = new Event();
+		for (int i = 0; i < 4; i++) {
+			LocationInfo info = new LocationInfo();
+			info.setAdress("adress" + i);
+			info.setPostalCode("postal" + i);
+			info = infoService.save(info);// save info
+
+			e = new Event();
+			e.setDescription("desc" + i);
+			e.setDate(new Date());
+			e.setName("name" + i);
+			e.setPrice(i * 100);
+			e.setLocInfo(info);
+			e.setGuide(g);
+			eventService.save(e);// save event
+		}
+
+		// test controller
+		mockMvc.perform(delete(URL_PREFIX + "/deleteEvent/"+e.getId()).principal(new UserPrincipal(g.getUsername())))
+				.andExpect(status().isOk());
+
+	}
+
 }
