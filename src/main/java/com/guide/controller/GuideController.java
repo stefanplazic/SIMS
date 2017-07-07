@@ -243,5 +243,31 @@ public class GuideController {
 		else
 			return new ResponseEntity<TourDTO>(HttpStatus.NOT_FOUND);
 	}
+	
+	@RequestMapping(value = "/viewTours", method = RequestMethod.GET)
+	public ResponseEntity<List<TourDTO>> viewTours(Principal principal) {
+
+		User u = userService.findByUsername(principal.getName());
+		if (u == null)
+			return new ResponseEntity<List<TourDTO>>(HttpStatus.UNAUTHORIZED);
+
+		if (u instanceof Guide) {
+			List<Tour> tours = tourService.findByGuide((Guide) u);
+			List<TourDTO> toursDto = new ArrayList<TourDTO>();
+
+			// populate eventsDto
+			for (Tour ev : tours) {
+				toursDto.add(new TourDTO(ev));
+			}
+
+			// return eventsDto
+			return new ResponseEntity<List<TourDTO>>(toursDto, HttpStatus.OK);
+		}
+
+		// if not type of guide
+		else
+			return new ResponseEntity<List<TourDTO>>(HttpStatus.NOT_FOUND);
+
+	}
 
 }

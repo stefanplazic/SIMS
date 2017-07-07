@@ -64,6 +64,54 @@ $(document).ready(function(){
 			alert("Radi");
 			}});
 	});
+
+	//show all tours
+	$.ajax({
+		url: "http://localhost:8080/api/guide/viewTours",
+		type:"GET",
+		headers: {"Authorization": localStorage.jwt},
+		success: function(data){
+			
+			var table = document.createElement('TABLE');
+			$.each(data,function(i,item){
+				var row = document.createElement('TR');
+				var celU = document.createElement('TD');
+				var celB = document.createElement('TD');
+				var celD = document.createElement('TD');
+				var celE = document.createElement('TD');
+
+				var buttonU = document.createElement('BUTTON');
+				buttonU.appendChild(document.createTextNode('Delete'));
+				buttonU.onclick = function(){
+					
+					$.ajax({
+
+						url : "http://localhost:8080/api/guide/deleteTour/"+item.id,
+						type: "DELETE",
+						headers: {"Authorization": localStorage.jwt},
+						success: function(){location.reload();},
+						error: function(){console.log("some error");}
+						});
+					};
+
+
+				celU.appendChild(document.createTextNode(item.name));
+				celB.appendChild(document.createTextNode(item.bgDate));
+				celD.appendChild(document.createTextNode(item.enDate));
+				celE.appendChild(buttonU);
+
+				row.appendChild(celU);
+				row.appendChild(celB);
+				row.appendChild(celD);
+				row.appendChild(celE);
+
+				table.appendChild(row);
+				
+				});
+			document.getElementById('mytours').appendChild(table);
+			},
+		error: function(){console.log("error loading tours!");}
+		});
 	
 
 });
@@ -143,7 +191,7 @@ $(document).ready(function(){
 		<div id="events"></div>
 		
 		<div id="mytours">
-			
+			<h2>My tours</h2>
 		</div>
 		
 	</div>
