@@ -28,20 +28,11 @@
 			<ul id="responsivemenu">
 				
 				
-				<li><a href="#">Manage tours</a>
-				<ul style="display: none;">					
-					<li><a href="team.html">Create tour</a></li>
-					<li><a href="pricing.html">Edit|delete tour</a></li>
-										
-					
-				</ul>
+				<li><a href="toursmanage.html">Manage tours</a>
+				
 				</li>
-				<li><a href="#">Manage events</a>
-				<ul>
-					<li><a href="portfolio2.html">Create event</a></li>
-					<li><a href="portfolio3.html">Edit|delete event</a></li>
-					
-				</ul>
+				<li><a href="eventsmanage.html">Manage events</a>
+				
 				</li>				
 				
 				<li><a href="#" id="logoutLink">Logout</a></li>
@@ -64,6 +55,51 @@
 </div>
 <!-- START content area
 ================================================== -->
+<script>
+$(document).ready(function(){
+	$.ajax({
+
+		url : "http://localhost:8080/api/user/cities",
+		type: "GET",
+		headers: {"Authorization": localStorage.jwt},
+		success: function(data){
+			var box = $("#searchSel");
+			$.each(data,function(i,item){
+				box.append($("<option />").val(item.id).text(item.name));
+				});
+			}});
+
+	$("#but").click(function(){
+			var event={};
+			
+			
+	
+	event["name"] = $('#evname').val();
+	event["description"] = $('#desc').val();
+	event["price"] = $('#price').val();
+	event["info"] = {"address": $('#address').val(), "postalCode": $('#postal').val()};
+	event["date"] = $('#dat').val();
+
+	console.log(event);
+
+	//ajax create event
+	
+	$.ajax({
+
+		url : "http://localhost:8080/api/guide/createEvent/"+$("#searchSel").val(),
+		type: "POST",
+		headers: {"Authorization": localStorage.jwt},
+		data: JSON.stringify(event),
+	    contentType: "application/json",
+		success: function(data){
+			alert("Radi");
+			}});
+	});
+	
+
+});
+</script>
+
 <div class="grid">
 	<div class="row space-bot">
 		<!--INTRO-->
@@ -73,58 +109,35 @@
 				<h1 class="title" style="text-transform:none;">Here you can see a lot of intersting things</h1>
 			</div>
 		</div>
-		<!--Box 1-->
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i> Responsive Theme</h2>
-			<div class="noshadowbox">
-				<h5>DELIVERY</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
-		<!--Box 2-->
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-cog smallrightmargin"></i> Unlimited Colors</h2>
-			<div class="noshadowbox">
-				<h5>QUALITY</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
-		<!--Box 3-->
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-user" style="margin-right:10px;"></i> MultiPurpose Use</h2>
-			<div class="noshadowbox">
-				<h5>PRICING</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
+	
+	
+	<div id="newEvent">
+		<table>
+			<tr>
+				<td>Event name</td>
+				<td>Desc</td>
+				<td>Price</td>
+				<td>Address</td>
+				<td>Postal code</td>
+				<td>City</td>
+				<td></td>
+			</tr>
+			<tr>
+			<td><input type="text" id="evname"/></td>
+				<td><input type="text" id="desc"/></td>
+				<td><input type="text" id="price"/></td>
+				<td><input type="text" id="address"/></td>
+				<td><input type="text" id="postal"/></td>
+				<td><select id="searchSel"></select></td>
+				<td><input type='date' id ="dat"/></td>
+				<td><input type="button" id="but" value="Create"/></td>
+			</tr>
+		</table>
+	</div>
+	
 		
-		<div class="c4">
-			<h2 class="title hometitlebg"><i class="icon-user" style="margin-right:10px;"></i> Something new</h2>
-			<div class="noshadowbox">
-				<h5>PRICING</h5>
-				<p>
-					 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam hendrerit lacus mattis orci fermentum mollis iaculis purus lobortis. In et purus ut nunc elementum dapibus facilisis in quam.
-				</p>
-				<p class="bottomlink">
-					<a href="#" class="neutralbutton"><i class="icon-link"></i></a>
-				</p>
-			</div>
-		</div>
+		
+		
 	</div>
 	
 	

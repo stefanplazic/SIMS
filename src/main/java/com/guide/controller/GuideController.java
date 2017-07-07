@@ -24,6 +24,7 @@ import com.guide.model.Guide;
 import com.guide.model.LocationInfo;
 import com.guide.model.Tour;
 import com.guide.model.User;
+import com.guide.service.CityService;
 import com.guide.service.EventService;
 import com.guide.service.GuideService;
 import com.guide.service.LocationInfoService;
@@ -52,9 +53,12 @@ public class GuideController {
 
 	@Autowired
 	private TouristTourService touristTourService;
+	
+	@Autowired
+	private CityService cityService;
 
-	@RequestMapping(value = "/createEvent", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<MessagesDTO> createEvent(@RequestBody EventDTO eventDto, Principal principal) {
+	@RequestMapping(value = "/createEvent/{id}", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<MessagesDTO> createEvent(@RequestBody EventDTO eventDto, Principal principal, @PathVariable Long id) {
 
 		User s = userService.findByUsername(principal.getName());
 		MessagesDTO dto = new MessagesDTO();
@@ -66,13 +70,15 @@ public class GuideController {
 		// save event
 		Event event = new Event();
 		event.setDescription(eventDto.getDescription());
-		event.setDate(new Date());
+		//event.setDate(new Date());
+		event.setDate(eventDto.getDate());
 		event.setName(eventDto.getName());
 		event.setPrice(eventDto.getPrice());
 
 		LocationInfo info = new LocationInfo();
 		info.setAdress(eventDto.getInfo().getAdress());
 		info.setPostalCode(eventDto.getInfo().getPostalCode());
+		info.setCity(cityService.findOne(id));
 
 		// save info
 		info = locationInfoService.save(info);
