@@ -26,7 +26,10 @@ import com.guide.GuideApplication;
 import com.guide.TestUtil;
 import com.guide.dto.LoginDTO;
 import com.guide.dto.UserDTO;
+import com.guide.model.Guide;
+import com.guide.model.User;
 import com.guide.service.UserService;
+import com.sun.security.auth.UserPrincipal;
 
 @SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -44,7 +47,7 @@ public class UserControllerTest {
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
-	
+
 	@Autowired
 	private UserService userService;
 
@@ -65,7 +68,8 @@ public class UserControllerTest {
 		user.setLastName("Plaza");
 		String json = TestUtil.json(user);
 
-		int previusSize = userService.findAll().size(); //take the number of user
+		int previusSize = userService.findAll().size(); // take the number of
+														// user
 		// do mock request
 		mockMvc.perform(post(URL_PREFIX + "/register/guide").contentType(contentType).content(json))
 				.andExpect(status().isCreated());
@@ -77,8 +81,6 @@ public class UserControllerTest {
 		user.setLastName("Plaza");
 		json = TestUtil.json(user);
 
-		
-		
 		mockMvc.perform(post(URL_PREFIX + "/register/tourist").contentType(contentType).content(json))
 				.andExpect(status().isConflict());
 
@@ -93,8 +95,8 @@ public class UserControllerTest {
 
 		mockMvc.perform(post(URL_PREFIX + "/register/admin").contentType(contentType).content(json))
 				.andExpect(status().isBadRequest());
-		
-		//check if num of user greater then priviusSize
+
+		// check if num of user greater then priviusSize
 		assertThat(userService.findAll()).hasSize(previusSize + 1);
 
 	}
@@ -128,5 +130,31 @@ public class UserControllerTest {
 
 		mockMvc.perform(post(URL_PREFIX + "/login").contentType(contentType).content(json))
 				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@Transactional
+	@Rollback(true)
+	public void testEdit() throws Exception {
+
+		User u = new Guide();
+		u.setUsername("user1");
+		u.setPass("oldpass");
+		u = userService.save(u);
+		String oldPas = u.getPass();
+		long id = u.getId();
+		
+
+		
+
+		u.setPass("new pas");
+		String json = TestUtil.json(u);
+
+		mockMvc.perform(post(URL_PREFIX + "/edit").contentType(contentType).content(json)
+				.principal(new UserPrincipal(u.getUsername()))).andExpect(status().isOk());
+
+		
+		u = userService.findOne(id);
+		assertThat(u.getPass().equals(oldPas));
 	}
 }
