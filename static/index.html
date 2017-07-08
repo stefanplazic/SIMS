@@ -1,0 +1,252 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="viewport" content="width=device-width"/>
+<title>GUIDE</title>
+<!-- STYLES & JQUERY 
+================================================== -->
+<link rel="stylesheet" type="text/css" href="css/style.css"/>
+<link rel="stylesheet" type="text/css" href="css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="css/slider.css"/>
+<link rel="stylesheet" type="text/css" href="css/skinblue.css"/><!-- change skin color -->
+<link rel="stylesheet" type="text/css" href="css/responsive.css"/>
+<script src="js/jquery-1.9.0.min.js"></script><!-- the rest of the scripts at the bottom of the document -->
+</head>
+<body>
+<!-- TOP LOGO & MENU
+================================================== -->
+<script>
+
+$(document).ready(function(){
+	//redirect if logged
+	if($.cookie('role') == 'ADMIN'){
+		window.location.href="admin/blocked.html";
+	}
+	if($.cookie('role') == 'TOURIST'){
+		window.location.href="tourist/profile.html";
+	}
+
+	if($.cookie('role') == 'GUIDE'){
+		window.location.href="guide/toursmanage.html";
+	}
+});
+
+
+</script>
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--Logo-->
+		<div class="c4">
+			<h1>GUIDE</h1>
+		</div>
+		<!--Menu-->
+		
+	</div>
+</div>
+<div class="undermenuarea">
+	<div class="boxedshadow">
+	</div>
+	<!-- SLIDER AREA
+	================================================== -->
+
+</div>
+<!-- UNDER SLIDER - BLACK AREA
+================================================== -->
+
+<div class="shadowunderslider">
+</div>
+<!-- START content area
+================================================== -->
+<div class="grid">
+	<div class="row space-bot">
+		<!--INTRO-->
+		<div class="c12">
+			<div class="royalcontent">
+				<h1 class="title" style="text-transform:none;">Welcome to login|registration page</h1>
+			</div>
+		</div>
+		<!--Box 1-->
+		<div class="c4">
+			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i> Login form</h2>
+			<div class="noshadowbox">
+				
+				<form action="#" id="loginForm">
+			
+				<input type="text" id="username" placeholder="Username"/>
+				<input type="password" id="pass" placeholder="Password"/>
+				<input type="submit" id="loginBtn" value= "Login" class="neutralbutton"/>
+				</form>
+				
+			</div>
+		</div>
+		
+		
+		<div class="c4">
+			<h2 class="title hometitlebg"><i class="icon-qrcode smallrightmargin"></i>Registration form</h2>
+			<div class="noshadowbox">
+				
+				<form action="#" id="registerForm">
+			
+				<input type="text" id="usernameReg" placeholder="Your Username"/>
+				<input type="password" id="passReg" placeholder="Password"/>
+				<input type="text" id="firstname" placeholder="First name"/>
+				<input type="text" id="lastname" placeholder="Last name"/>
+				<input type="radio" name="role" value="tourist" checked > Tourist
+  				<input type="radio" name="role" value="guide" > Guide<br><br>
+				
+				<input type="submit" id="regBtn" value="Register" class="neutralbutton"/>
+				</form>
+				
+			</div>
+		</div>
+		
+	</div>
+	
+	
+	
+</div><!-- end grid -->
+
+<!-- FOOTER
+================================================== -->
+<div id="wrapfooter">
+	<div class="grid">
+		<div class="row" id="footer">
+			<!-- to top button  -->
+			
+			
+			
+			<!-- 3rd column -->
+			<div class="c3">
+				<h2 class="title"><i class="icon-envelope-alt"></i> Contact</h2>
+				<hr class="footerstress">
+				<dl>
+					<dt>Stefan Plazic, Vladimir Gajcin i Srbislav Stojic</dt>
+					<dd>E-mail: guide@gmail.com</dd>
+				</dl>
+				
+			</div>
+			
+			<!-- end 4th column -->
+		</div>
+	</div>
+</div>
+<!-- copyright area -->
+<div class="copyright">
+	<div class="grid">
+		<div class="row">
+			<div class="c6">
+				 Your Name &copy; 2015. All Rights Reserved.
+			</div>
+			<div class="c6">
+				<span class="right">
+				Premium Template by WowThemesNet </span>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END CONTENT AREA -->
+<!-- JAVASCRIPTS
+================================================== -->
+
+<script>
+
+//login user
+$("#loginForm").submit(function(e){
+	e.preventDefault();
+	var username = $("#username").val();
+	var pass = $("#pass").val();
+
+	var loginDTO = {"username": username,"password":pass};
+	//use ajax 
+	$.ajax({
+	url : "http://localhost:8080/api/user/login",
+	type: "POST",
+    data: JSON.stringify(loginDTO),
+    contentType: "application/json",
+    success: function(data){
+
+	//set cookie
+	
+	$.cookie('jwt',String(data.jwt));
+	$.cookie('role', String(data.rola));
+	localStorage.jwt = data.jwt;
+	localStorage.role = data.rola;
+
+	//redirect
+	location.reload();
+        },
+    error : function(xhr, ajaxOptions, thrownError){
+    	resp = $.parseJSON(xhr.responseText);
+	    alert(resp.error);}
+		});
+});
+
+//register user
+$("#registerForm").submit(function(e){
+e.preventDefault();
+var username = $("#usernameReg").val();
+var password = $("#passReg").val();
+var firstname = $("#firstname").val();
+var lastname = $("#lastname").val();
+var role = $("input[name='role']:checked").val();
+
+//check if nothing is empty
+if(username.length ==0 || password.length == 0 || firstname.length == 0 || lastname.length == 0)
+	alert("Must fill all data");
+
+else{
+	var userDto = {"username":username,
+			"pass":password,
+			"firstName": firstname,
+			"lastName": lastname
+			
+			};
+
+	//ajax request
+	$.ajax({
+		url : "http://localhost:8080/api/user/register/"+role,
+		type: "POST",
+	    data: JSON.stringify(userDto),
+	    contentType: "application/json",
+	    success: function(data){
+
+		//if all good - login
+	    	$.ajax({
+	    		url : "http://localhost:8080/api/user/login",
+	    		type: "POST",
+	    	    data: JSON.stringify({"username":username,"password":password}),
+	    	    contentType: "application/json",
+	    	    success: function(data){
+
+	    		//set cookie
+	    		$.cookie('jwt',data.jwt, { path: '/' });
+	    		$.cookie('role', data.rola, { path: '/' });
+
+	    		//redirect
+	    		location.reload();
+	    	        },
+	    	    error : function(xhr, ajaxOptions, thrownError){}
+	    			});
+		
+	        },
+	    error : function(xhr, ajaxOptions, thrownError){
+			resp = $.parseJSON(xhr.responseText);
+		    alert(resp.error);}
+			});
+
+}
+
+});
+	
+
+
+</script>
+
+<!-- menu & scroll to top -->
+<script src="js/common.js"></script>
+
+<script src="js/jquery.cookie.js"></script>
+
+
+</body>
+</html>

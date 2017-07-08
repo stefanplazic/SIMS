@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="viewport" content="width=device-width"/>
+<title>GUIDE</title>
+<!-- STYLES & JQUERY 
+================================================== -->
+<link rel="stylesheet" type="text/css" href="../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/slider.css"/>
+<link rel="stylesheet" type="text/css" href="../css/skinblue.css"/><!-- change skin color -->
+<link rel="stylesheet" type="text/css" href="../css/responsive.css"/>
+<script src="../js/jquery-1.9.0.min.js"></script><!-- the rest of the scripts at the bottom of the document -->
+</head>
+<body>
+<!-- TOP LOGO & MENU
+================================================== -->
+
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--Logo-->
+		<div class="c4">
+			<h1>GUIDE</h1>
+		</div>
+		<!--Menu-->
+		<div class="c8">
+			<nav id="topNav">
+			<ul id="responsivemenu">
+				
+				
+				<li><a href="toursmanage.html">Manage tours</a>
+				
+				</li>
+				<li><a href="eventsmanage.html">Manage events</a>
+				
+				</li>				
+				
+				<li><a href="#" id="logoutLink">Logout</a></li>
+			</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<div class="undermenuarea">
+	<div class="boxedshadow">
+	</div>
+	<!-- SLIDER AREA
+	================================================== -->
+
+</div>
+<!-- UNDER SLIDER - BLACK AREA
+================================================== -->
+
+<div class="shadowunderslider">
+</div>
+<!-- START content area
+================================================== -->
+<script>
+$(document).ready(function(){
+	$.ajax({
+
+		url : "http://localhost:8080/api/user/cities",
+		type: "GET",
+		headers: {"Authorization": localStorage.jwt},
+		success: function(data){
+			var box = $("#searchSel");
+			$.each(data,function(i,item){
+				box.append($("<option />").val(item.id).text(item.name));
+				});
+			}});
+
+	$("#but").click(function(){
+			var event={};
+			
+			
+	
+	event["name"] = $('#evname').val();
+	event["description"] = $('#desc').val();
+	event["price"] = $('#price').val();
+	event["info"] = {"address": $('#address').val(), "postalCode": $('#postal').val()};
+	event["date"] = $('#dat').val();
+
+	console.log(event);
+
+	//ajax create event
+	
+	$.ajax({
+
+		url : "http://localhost:8080/api/guide/createEvent/"+$("#searchSel").val(),
+		type: "POST",
+		headers: {"Authorization": localStorage.jwt},
+		data: JSON.stringify(event),
+	    contentType: "application/json",
+		success: function(data){
+			alert("Radi");
+			}});
+	});
+
+
+	
+
+});
+</script>
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--INTRO-->
+		<div class="c12">
+			<div class="royalcontent">
+				<h1 class="royalheader">WELCOME</h1>
+				<h1 class="title" style="text-transform:none;">Here you can see a lot of intersting things</h1>
+			</div>
+		</div>
+	
+	
+	<div id="newEvent">
+		<table>
+			<tr>
+				<td>Event name</td>
+				<td>Desc</td>
+				<td>Price</td>
+				<td>Address</td>
+				<td>Postal code</td>
+				<td>City</td>
+				<td></td>
+			</tr>
+			<tr>
+			<td><input type="text" id="evname"/></td>
+				<td><input type="text" id="desc"/></td>
+				<td><input type="text" id="price"/></td>
+				<td><input type="text" id="address"/></td>
+				<td><input type="text" id="postal"/></td>
+				<td><select id="searchSel"></select></td>
+				<td><input type='date' id ="dat"/></td>
+				<td><input type="button" id="but" value="Create"/></td>
+			</tr>
+		</table>
+	</div>
+	
+		
+		
+		
+	</div>
+	
+	
+	
+</div><!-- end grid -->
+
+<!-- FOOTER
+================================================== -->
+<div id="wrapfooter">
+	<div class="grid">
+		<div class="row" id="footer">
+			<!-- to top button  -->
+			
+			
+			
+			<!-- 3rd column -->
+			<div class="c3">
+				<h2 class="title"><i class="icon-envelope-alt"></i> Contact</h2>
+				<hr class="footerstress">
+				<dl>
+					<dt>Stefan Plazic, Vladimir Gajcin i Srbislav Stojic</dt>
+					<dd>E-mail: guide@gmail.com</dd>
+				</dl>
+				
+			</div>
+			
+			<!-- end 4th column -->
+		</div>
+	</div>
+</div>
+<!-- copyright area -->
+<div class="copyright">
+	<div class="grid">
+		<div class="row">
+			<div class="c6">
+				 Your Name &copy; 2015. All Rights Reserved.
+			</div>
+			<div class="c6">
+				<span class="right">
+				Premium Template by WowThemesNet </span>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END CONTENT AREA -->
+<!-- JAVASCRIPTS
+================================================== -->
+
+
+<!-- menu & scroll to top -->
+<script src="../js/common.js"></script>
+
+
+<script src="../js/logout.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+
+
+
+
+
+
+</body>
+</html>

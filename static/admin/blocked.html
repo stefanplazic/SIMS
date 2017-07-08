@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="viewport" content="width=device-width"/>
+<title>GUIDE</title>
+<!-- STYLES & JQUERY 
+================================================== -->
+<link rel="stylesheet" type="text/css" href="../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/slider.css"/>
+<link rel="stylesheet" type="text/css" href="../css/skinblue.css"/><!-- change skin color -->
+<link rel="stylesheet" type="text/css" href="../css/responsive.css"/>
+<script src="../js/jquery-1.9.0.min.js"></script><!-- the rest of the scripts at the bottom of the document -->
+</head>
+<body>
+<!-- TOP LOGO & MENU
+================================================== -->
+<script>
+$(document).ready(function(){
+	
+	$.ajax({
+		  url: "http://localhost:8080/api/admin/blockedUsers",
+		  type: 'GET',
+		  // Fetch the stored token from localStorage and set in the header
+		  headers: {"Authorization": localStorage.jwt},
+		  success: function(data){
+
+			var table = document.createElement('TABLE');
+			  
+			  $.each(data,function(i,item){
+
+				var row = document.createElement('TR');
+				var celU = document.createElement('TD');
+				var celB = document.createElement('TD');
+				var buttonB = document.createElement('BUTTON');
+
+				buttonB.appendChild(document.createTextNode('unblock'));
+				buttonB.onclick = function(){
+
+				//ajax
+					$.ajax({
+		  				url: "http://localhost:8080/api/admin/unblock",
+		  				type: 'POST',
+		  				headers: {"Authorization": localStorage.jwt},
+		  				data: JSON.stringify({"id":item.id}),
+		  			    contentType: "application/json",
+		  			    success: function(data){location.reload();}
+		  			    });
+
+					};
+
+				celU.appendChild(document.createTextNode(item.username));
+				celB.appendChild(buttonB);
+
+				row.appendChild(celU);
+				row.appendChild(celB);
+				table.appendChild(row);
+				  
+				
+				
+				document.getElementById('someDiv').appendChild(table);
+				  
+				
+			  });
+			  },
+		  error:function(xhr, ajaxOptions, thrownError){
+			 
+			  
+			  }
+		});
+
+
+	
+	
+});
+
+
+
+</script>
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--Logo-->
+		<div class="c4">
+			<h1>List of blocked users</h1>
+		</div>
+		<!--Menu-->
+		<div class="c8">
+			<nav id="topNav">
+			<ul id="responsivemenu">
+				
+				
+				
+				
+				</li>
+				<li><a href="#">Managed users</a>
+				<ul>
+					<li><a href="reported.html">Reported users</a></li>
+					<li><a href="blocked.html">Blocked users</a></li>
+					
+				</ul>
+				</li>				
+				
+				<li><a href="#" id="logoutLink">Logout</a></li>
+			</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<div class="undermenuarea">
+	<div class="boxedshadow">
+	</div>
+	<!-- SLIDER AREA
+	================================================== -->
+
+</div>
+<!-- UNDER SLIDER - BLACK AREA
+================================================== -->
+
+<div class="shadowunderslider">
+</div>
+<!-- START content area
+================================================== -->
+<div class="grid">
+	<div class="row space-bot" id="someDiv">
+		
+		
+		
+		
+		
+	</div>
+	
+	
+	
+</div><!-- end grid -->
+
+<!-- FOOTER
+================================================== -->
+<div id="wrapfooter">
+	<div class="grid">
+		<div class="row" id="footer">
+			<!-- to top button  -->
+			
+			
+			
+			<!-- 3rd column -->
+			<div class="c3">
+				<h2 class="title"><i class="icon-envelope-alt"></i> Contact</h2>
+				<hr class="footerstress">
+				<dl>
+					<dt>Stefan Plazic, Vladimir Gajcin i Srbislav Stojic</dt>
+					<dd>E-mail: guide@gmail.com</dd>
+				</dl>
+				
+			</div>
+			
+			<!-- end 4th column -->
+		</div>
+	</div>
+</div>
+<!-- copyright area -->
+<div class="copyright">
+	<div class="grid">
+		<div class="row">
+			<div class="c6">
+				 Your Name &copy; 2015. All Rights Reserved.
+			</div>
+			<div class="c6">
+				<span class="right">
+				Premium Template by WowThemesNet </span>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END CONTENT AREA -->
+<!-- JAVASCRIPTS
+================================================== -->
+
+
+<!-- menu & scroll to top -->
+<script src="../js/common.js"></script>
+
+<script src="../js/logout.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+
+
+
+
+
+
+
+</body>
+</html>

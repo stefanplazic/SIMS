@@ -1,0 +1,259 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="viewport" content="width=device-width"/>
+<title>GUIDE</title>
+<!-- STYLES & JQUERY 
+================================================== -->
+<link rel="stylesheet" type="text/css" href="../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/slider.css"/>
+<link rel="stylesheet" type="text/css" href="../css/skinblue.css"/><!-- change skin color -->
+<link rel="stylesheet" type="text/css" href="../css/responsive.css"/>
+<script src="../js/jquery-1.9.0.min.js"></script><!-- the rest of the scripts at the bottom of the document -->
+</head>
+<body>
+<!-- TOP LOGO & MENU
+================================================== -->
+
+<script>
+$(document).ready(function(){
+	$.ajax({
+
+		url : "http://localhost:8080/api/guide/viewEvents",
+		type: "GET",
+		headers: {"Authorization": localStorage.jwt},
+		success: function(data){
+
+			$.each(data,function(i,item){
+					$("#events").append("<input type='checkbox' name='event[]' value='"+item.id+"'/> "+item.name+"<br>");
+				});
+			
+			},
+			error : function(xhr, ajaxOptions, thrownError){
+		    	resp = $.parseJSON(xhr.responseText);
+			    console.log("error");}
+		    });
+
+	$("#but").click(function(){
+			var event={};
+			
+			
+	
+	event["name"] = $('#evname').val();
+	event["beginDate"] = $('#begdat').val();
+	event["endDate"] = $('#enddat').val();
+	 event["events"] = [];
+	var checkbox  = document.getElementsByName('event[]');
+	console.log(checkbox.length);
+	for(var i=0; i< checkbox.length; i++) {
+	    
+	        event["events"].push({"id": checkbox[i].value})
+	}
+	console.log(event);
+
+	//ajax create event
+	
+	$.ajax({
+
+		url : "http://localhost:8080/api/guide/createTour",
+		type: "POST",
+		headers: {"Authorization": localStorage.jwt},
+		data: JSON.stringify(event),
+	    contentType: "application/json",
+		success: function(data){
+			location.reload();
+			}});
+	});
+
+	//show all tours
+	$.ajax({
+		url: "http://localhost:8080/api/guide/viewTours",
+		type:"GET",
+		headers: {"Authorization": localStorage.jwt},
+		success: function(data){
+			
+			var table = document.createElement('TABLE');
+			$.each(data,function(i,item){
+				var row = document.createElement('TR');
+				var celU = document.createElement('TD');
+				var celB = document.createElement('TD');
+				var celD = document.createElement('TD');
+				var celE = document.createElement('TD');
+
+				var buttonU = document.createElement('BUTTON');
+				buttonU.appendChild(document.createTextNode('Delete'));
+				buttonU.onclick = function(){
+					
+					$.ajax({
+
+						url : "http://localhost:8080/api/guide/deleteTour/"+item.id,
+						type: "DELETE",
+						headers: {"Authorization": localStorage.jwt},
+						success: function(){location.reload();},
+						error: function(){console.log("some error");}
+						});
+					};
+
+
+				celU.appendChild(document.createTextNode(item.name));
+				celB.appendChild(document.createTextNode(item.bgDate));
+				celD.appendChild(document.createTextNode(item.enDate));
+				celE.appendChild(buttonU);
+
+				row.appendChild(celU);
+				row.appendChild(celB);
+				row.appendChild(celD);
+				row.appendChild(celE);
+
+				table.appendChild(row);
+				
+				});
+			document.getElementById('mytours').appendChild(table);
+			},
+		error: function(){console.log("error loading tours!");}
+		});
+	
+
+});
+</script>
+
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--Logo-->
+		<div class="c4">
+			<h1>GUIDE</h1>
+		</div>
+		<!--Menu-->
+		<div class="c8">
+			<nav id="topNav">
+			<ul id="responsivemenu">
+				
+				
+				<li><a href="toursmanage.html">Manage tours</a>
+				
+				</li>
+				<li><a href="eventsmanage.html">Manage events</a>
+				
+				</li>				
+				
+				<li><a href="#" id="logoutLink">Logout</a></li>
+			</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<div class="undermenuarea">
+	<div class="boxedshadow">
+	</div>
+	<!-- SLIDER AREA
+	================================================== -->
+
+</div>
+<!-- UNDER SLIDER - BLACK AREA
+================================================== -->
+
+<div class="shadowunderslider">
+</div>
+<!-- START content area
+================================================== -->
+<div class="grid">
+	<div class="row space-bot">
+		<!--INTRO-->
+		<div class="c12">
+			<div class="royalcontent">
+				<h1 class="royalheader">WELCOME</h1>
+				<h1 class="title" style="text-transform:none;">Here you can see a lot of intersting things</h1>
+			</div>
+		</div>
+		
+		<div id="newEvent">
+		<table>
+			<tr>
+				<td> name</td>
+				<td>begin date</td>
+				<td>end date</td>
+				
+				<td></td>
+			</tr>
+			<tr>
+			<td><input type="text" id="evname"/></td>
+				
+				
+				<td><input type='date' id ="begdat"/></td>
+				<td><input type='date' id ="enddat"/></td>
+				<td><input type="button" id="but" value="Create"/></td>
+			</tr>
+		</table>
+	</div>
+	
+	
+		<div id="events"></div>
+		
+		<div id="mytours">
+			<h2>My tours</h2>
+		</div>
+		
+	</div>
+	
+	
+	
+</div><!-- end grid -->
+
+<!-- FOOTER
+================================================== -->
+<div id="wrapfooter">
+	<div class="grid">
+		<div class="row" id="footer">
+			<!-- to top button  -->
+			
+			
+			
+			<!-- 3rd column -->
+			<div class="c3">
+				<h2 class="title"><i class="icon-envelope-alt"></i> Contact</h2>
+				<hr class="footerstress">
+				<dl>
+					<dt>Stefan Plazic, Vladimir Gajcin i Srbislav Stojic</dt>
+					<dd>E-mail: guide@gmail.com</dd>
+				</dl>
+				
+			</div>
+			
+			<!-- end 4th column -->
+		</div>
+	</div>
+</div>
+<!-- copyright area -->
+<div class="copyright">
+	<div class="grid">
+		<div class="row">
+			<div class="c6">
+				 Your Name &copy; 2015. All Rights Reserved.
+			</div>
+			<div class="c6">
+				<span class="right">
+				Premium Template by WowThemesNet </span>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END CONTENT AREA -->
+<!-- JAVASCRIPTS
+================================================== -->
+
+
+<!-- menu & scroll to top -->
+<script src="../js/common.js"></script>
+
+
+<script src="../js/logout.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+
+
+
+
+
+
+</body>
+</html>

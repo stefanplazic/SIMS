@@ -1,0 +1,202 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="viewport" content="width=device-width"/>
+<title>GUIDE</title>
+<!-- STYLES & JQUERY 
+================================================== -->
+<link rel="stylesheet" type="text/css" href="../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/slider.css"/>
+<link rel="stylesheet" type="text/css" href="../css/skinblue.css"/><!-- change skin color -->
+<link rel="stylesheet" type="text/css" href="../css/responsive.css"/>
+<script src="../js/jquery-1.9.0.min.js"></script><!-- the rest of the scripts at the bottom of the document -->
+</head>
+<body>
+<!-- TOP LOGO & MENU
+================================================== -->
+
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--Logo-->
+		<div class="c4">
+			<h1>TOURIST</h1>
+		</div>
+		<!--Menu-->
+		<div class="c8">
+			<nav id="topNav">
+			<ul id="responsivemenu">
+				
+				
+				<li><a href="subTours.html">Subscribed tours</a>
+				
+				</li>
+				
+				
+				<li><a href="profile.html">Profile</a>
+				
+				</li>				
+				<li><a href="report.html">Report users</a></li>
+				<li><a id="logoutLink">Logout</a></li>
+			</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<div class="undermenuarea">
+	<div class="boxedshadow">
+	</div>
+	<!-- SLIDER AREA
+	================================================== -->
+
+</div>
+<!-- UNDER SLIDER - BLACK AREA
+================================================== -->
+
+<div class="shadowunderslider">
+</div>
+<!-- START content area
+================================================== -->
+<script>
+	$(document).ready(function(){
+		$.ajax({
+
+			url : "http://localhost:8080/api/tourist/all",
+			type: "GET",
+			headers: {"Authorization": localStorage.jwt},
+			success: function(data){
+
+				var table = document.createElement('TABLE');
+
+				$.each(data,function(i,item){
+
+					var row = document.createElement('TR');
+					var celU = document.createElement('TD');
+					var celB = document.createElement('TD');
+					var celS = document.createElement('TD');
+					var celE = document.createElement('TD');
+					
+					
+					var buttonU = document.createElement('BUTTON');
+					buttonU.appendChild(document.createTextNode('Report user'));
+
+					buttonU.onclick = function(){
+						//ajax call
+						$.ajax({
+			  				url: "http://localhost:8080/api/tourist/report/"+item.id,
+			  				type: 'GET',
+			  				headers: {"Authorization": localStorage.jwt},
+			  				
+			  			    success: function(data){location.reload();}
+			  			    });
+
+						};
+					
+					celU.appendChild(document.createTextNode(item.username));
+					celB.appendChild(document.createTextNode(item.firstName));
+					celS.appendChild(document.createTextNode(item.firstName));
+					celE.appendChild(buttonU);
+
+					if(item.active){
+						celT.appendChild(buttonU);
+						}
+					
+
+					//append to row
+					row.appendChild(celU);
+					row.appendChild(celB);
+					row.appendChild(celS);
+					
+					row.appendChild(celE);
+					
+					table.appendChild(row);
+					});
+
+				document.getElementById('contentDiv').appendChild(table);
+				},
+			error: function(xhr, ajaxOptions, thrownError){}
+			});
+
+	
+		});
+</script>
+
+<div class="grid">
+	<div class="row space-bot">
+		<!--INTRO-->
+		<div class="c12">
+			<div class="royalcontent">
+				<h1 class="royalheader">WELCOME</h1>
+				<h1 class="title" style="text-transform:none;">Subscribed tours</h1>
+			</div>
+		</div>
+		
+		<div id="contentDiv">
+			<!-- our tours goes here -->
+			<h1>List of all users</h1>
+		</div>
+		
+		
+		
+	</div>
+	
+	
+	
+</div><!-- end grid -->
+
+<!-- FOOTER
+================================================== -->
+<div id="wrapfooter">
+	<div class="grid">
+		<div class="row" id="footer">
+			<!-- to top button  -->
+			
+			
+			
+			<!-- 3rd column -->
+			<div class="c3">
+				<h2 class="title"><i class="icon-envelope-alt"></i> Contact</h2>
+				<hr class="footerstress">
+				<dl>
+					<dt>Stefan Plazic, Vladimir Gajcin i Srbislav Stojic</dt>
+					<dd>E-mail: guide@gmail.com</dd>
+				</dl>
+				
+			</div>
+			
+			<!-- end 4th column -->
+		</div>
+	</div>
+</div>
+<!-- copyright area -->
+<div class="copyright">
+	<div class="grid">
+		<div class="row">
+			<div class="c6">
+				 Your Name &copy; 2015. All Rights Reserved.
+			</div>
+			<div class="c6">
+				<span class="right">
+				Premium Template by WowThemesNet </span>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END CONTENT AREA -->
+<!-- JAVASCRIPTS
+================================================== -->
+
+
+<!-- menu & scroll to top -->
+<script src="../js/common.js"></script>
+
+<script src="../js/logout.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+
+
+
+
+
+
+</body>
+</html>
