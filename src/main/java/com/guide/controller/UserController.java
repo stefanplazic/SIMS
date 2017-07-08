@@ -35,6 +35,7 @@ import com.guide.model.LocationInfo;
 import com.guide.model.Person;
 import com.guide.model.Tour;
 import com.guide.model.Tourist;
+import com.guide.model.TouristTour;
 import com.guide.model.User;
 import com.guide.security.TokenUtils;
 import com.guide.service.CityService;
@@ -43,6 +44,7 @@ import com.guide.service.LocationInfoService;
 import com.guide.service.PersonService;
 import com.guide.service.TourService;
 import com.guide.service.TouristService;
+import com.guide.service.TouristTourService;
 import com.guide.service.UserService;
 
 @RestController
@@ -78,6 +80,9 @@ public class UserController {
 
 	@Autowired
 	private PersonService personService;
+	
+	@Autowired
+	private TouristTourService touristTourService;
 
 	/**
 	 * Used for user login, it uses POST Method , and requires LoginDTO
@@ -184,8 +189,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
-	public ResponseEntity<List<TourDTO>> searchbyCity(@PathVariable Long id) {
+	public ResponseEntity<List<TourDTO>> searchbyCity(@PathVariable Long id, Principal principal) {
 
+		Tourist u = (Tourist)userService.findByUsername(principal.getName());
+		
 		// find location infos
 		City city = cityService.findOne(id);
 		List<LocationInfo> infos = locationInfoService.findByCity(city);
@@ -197,7 +204,14 @@ public class UserController {
 			Set<Tour> tours = e.getTours();
 			for (Tour t : tours) {
 				TourDTO tDto = new TourDTO(t);
-				if (!dtos.contains(tDto))
+				boolean add = true;
+				
+				List<TouristTour> tt = touristTourService.findByTour(t);
+				for(TouristTour ttt : tt)
+					if(ttt.getTourist() == u)
+						add = false;
+				
+				if (!dtos.contains(tDto) && add)
 					dtos.add(tDto);
 			}
 		}
