@@ -34,6 +34,9 @@ public class Tour {
 
 	@OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private Set<TouristTour> tours = new HashSet<TouristTour>();
+	
+	@OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	private Set<Comment> comments = new HashSet<Comment>();
 
 	public Tour() {
 		// TODO Auto-generated constructor stub
@@ -95,4 +98,13 @@ public class Tour {
 		this.tours = tours;
 	}
 
+	public Set<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Set<Comment> comments) {
+		this.comments = comments;
+	}
+
+	
 }

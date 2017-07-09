@@ -23,12 +23,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.guide.dto.CityDTO;
+import com.guide.dto.CommentDTO;
 import com.guide.dto.LoginDTO;
 import com.guide.dto.MessagesDTO;
 import com.guide.dto.TourDTO;
 import com.guide.dto.UserDTO;
 import com.guide.model.Admin;
 import com.guide.model.City;
+import com.guide.model.Comment;
 import com.guide.model.Event;
 import com.guide.model.Guide;
 import com.guide.model.LocationInfo;
@@ -37,6 +39,7 @@ import com.guide.model.Tour;
 import com.guide.model.Tourist;
 import com.guide.model.TouristTour;
 import com.guide.model.User;
+import com.guide.repository.CommentRepository;
 import com.guide.security.TokenUtils;
 import com.guide.service.CityService;
 import com.guide.service.GuideService;
@@ -83,6 +86,9 @@ public class UserController {
 	
 	@Autowired
 	private TouristTourService touristTourService;
+	
+	@Autowired
+	private CommentRepository commentRepository;
 
 	/**
 	 * Used for user login, it uses POST Method , and requires LoginDTO
@@ -205,14 +211,14 @@ public class UserController {
 			Set<Tour> tours = e.getTours();
 			for (Tour t : tours) {
 				TourDTO tDto = new TourDTO(t);
-				boolean add = true;
+				
 				
 				List<TouristTour> tt = touristTourService.findByTour(t);
 				for(TouristTour ttt : tt)
 					if(ttt.getTourist() == u)
-						add = false;
+						tDto.setApp(true);
 				
-				if (!dtos.contains(tDto) && add)
+				if (!dtos.contains(tDto) )
 					dtos.add(tDto);
 			}
 		}
@@ -262,4 +268,29 @@ public class UserController {
 
 		return new ResponseEntity<List<CityDTO>>(dto, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/postComment/{tourId}", method = RequestMethod.POST)
+	public ResponseEntity<MessagesDTO> comment(Principal principal, @PathVariable Long tourId, @RequestBody CommentDTO commentDTO) {
+		
+		Tour t = tourService.findOne(tourId);
+		if(t == null)
+			return new ResponseEntity<MessagesDTO>( HttpStatus.NOT_FOUND);
+		
+		User u = userService.findByUsername(principal.getName());
+		
+		//save the comment
+		Comment comment = new Comment();
+		comment.setContent(commentDTO.getContent());
+		comment.setPerson((Person)u);
+		comment.setPublicationDate(new Date());
+		comment.setTour(t);
+		
+		comment = commentRepository.save(comment);
+		
+		
+		return new ResponseEntity<MessagesDTO>( HttpStatus.OK);
+	}
+	
+
+	
 }

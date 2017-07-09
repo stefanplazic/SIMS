@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.guide.model.Comment;
 import com.guide.model.Event;
 import com.guide.model.Tour;
 
@@ -18,7 +19,8 @@ public class TourDTO {
 	private boolean isActive = false;
 	private String bgDate;
 	private String enDate;
-	
+	private List<CommentDTO> comments = new ArrayList<CommentDTO>();
+	private boolean isApp = false;
 
 	public TourDTO() {
 
@@ -34,10 +36,16 @@ public class TourDTO {
 		}
 		if (beginDate.compareTo(new Date()) > 0)
 			this.isActive = true;
-		//format dates
+		// format dates
 		SimpleDateFormat endFor = new SimpleDateFormat(" dd/MM/yyyy");
 		this.bgDate = endFor.format(beginDate);
 		this.enDate = endFor.format(endDate);
+
+		// set comments
+		for (Comment c : tour.getComments()) {
+			comments.add(new CommentDTO(c));
+		}
+
 	}
 
 	public Long getId() {
@@ -104,6 +112,20 @@ public class TourDTO {
 		this.enDate = enDate;
 	}
 
-	
+	public List<CommentDTO> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<CommentDTO> comments) {
+		this.comments = comments;
+	}
+
+	public boolean isApp() {
+		return isApp;
+	}
+
+	public void setApp(boolean isApp) {
+		this.isApp = isApp;
+	}
 
 }

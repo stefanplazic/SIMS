@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="viewport" content="width=device-width" />
+<title>GUIDE</title>
+<!-- STYLES & JQUERY 
+================================================== -->
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css" />
+<link rel="stylesheet" type="text/css" href="../css/slider.css" />
+<link rel="stylesheet" type="text/css" href="../css/skinblue.css" />
+<!-- change skin color -->
+<link rel="stylesheet" type="text/css" href="../css/responsive.css" />
+<script src="../js/jquery-1.9.0.min.js"></script>
+<!-- the rest of the scripts at the bottom of the document -->
+</head>
+<body>
+	<!-- TOP LOGO & MENU
+================================================== -->
+	<script>
+$(document).ready(function(){
+	
+	$.ajax({
+		  url: "http://localhost:8080/api/user/profile/",
+		  type: 'GET',
+		  // Fetch the stored token from localStorage and set in the header
+		  headers: {"Authorization": localStorage.jwt},
+		  success: function(data){
+				$("#firstname").val(data.firstName);
+				$("#lastname").val(data.lastName);
+			  },
+		  error:function(xhr, ajaxOptions, thrownError){
+				 
+			  
+		  }
+				
+	
+});
+
+	$("#chPass").change(function(){
+			
+			//enable passwords
+			$("#passwordRep").prop('disabled', !$("#chPass").prop('checked'));
+			$("#password").prop('disabled', !$("#chPass").prop('checked'));
+			
+		});
+
+	//edit button clicked
+	$("#editBtn").click(function(){
+		var valid = true;
+		var userDto={};
+		
+		var firstname = $("#firstname").val();
+		var lastname = $("#lastname").val();
+
+		userDto['firstName'] = firstname;
+		userDto['lastName'] = lastname;
+
+		if(firstname.length ==0 || lastname.length ==0){
+			alert("Fist name and last name are empty!!")
+			valid = false;
+			}
+		
+		if($("#chPass").prop('checked')){
+				if($("#password").val().length ==0 || $("#password").val()!=  $("#passwordRep").val())
+					{
+						alert("Password must be equal!")
+						valid = false;
+					}
+				else{
+					userDto['pass']= $("#password").val()
+					
+					}
+			}
+
+		//do ajax
+		if(valid)
+		$.ajax({
+			  url: "http://localhost:8080/api/user/edit",
+			  // Fetch the stored token from localStorage and set in the header
+			  headers: {"Authorization": localStorage.jwt},
+			  type: "POST",
+			    data: JSON.stringify(userDto),
+			    contentType: "application/json",
+			  success: function(data){
+				  alert("Data changed")
+				  location.reload();
+				  },
+			  error:function(xhr, ajaxOptions, thrownError){
+					 
+				  
+			  }
+					
+		
+	});
+		
+		});
+
+});
+
+</script>
+
+
+	<div class="grid">
+		<div class="row space-bot">
+			<!--Logo-->
+			<div class="c4">
+				<h1>TOURIST</h1>
+			</div>
+			<!--Menu-->
+			<div class="c8">
+				<nav id="topNav">
+					<ul id="responsivemenu">
+
+
+						<li><a href="toursmanage.html">Manage tours</a>
+				
+				</li>
+				<li><a href="eventsmanage.html">Manage events</a>
+				
+				</li>				
+				<li><a href="profile.html">Profile</a>
+				
+				</li>	
+				<li><a href="#" id="logoutLink">Logout</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+	<div class="undermenuarea">
+		<div class="boxedshadow"></div>
+		<!-- SLIDER AREA
+	================================================== -->
+
+	</div>
+	<!-- UNDER SLIDER - BLACK AREA
+================================================== -->
+
+	<div class="shadowunderslider"></div>
+	<!-- START content area
+================================================== -->
+	<div class="grid">
+		<div class="row space-bot">
+			<!--INTRO-->
+			<div class="c12">
+				<div class="royalcontent">
+					<h1 class="royalheader">WELCOME</h1>
+
+				</div>
+			</div>
+			<!--Box 1-->
+			<div class="c4">
+				<h2 class="title hometitlebg">
+					<i class="icon-qrcode smallrightmargin"></i> Profile data
+				</h2>
+				<div class="noshadowbox">
+					<h5>Edit</h5>
+					<input type='text' id="firstname" placeholder="First name" /> <input
+						type='text' id="lastname" placeholder="Last name" /> <input
+						type='password' id="password" placeholder="Password" disabled /> <input
+						type='password' id="passwordRep" placeholder="Repat password"
+						disabled /> <input type='checkbox' id="chPass" /> Change pass <input
+						type="button" id="editBtn" value="Edit" class="neutralbutton" />
+				</div>
+			</div>
+
+		</div>
+
+
+
+	</div>
+	<!-- end grid -->
+
+	<!-- FOOTER
+================================================== -->
+	<div id="wrapfooter">
+		<div class="grid">
+			<div class="row" id="footer">
+				<!-- to top button  -->
+
+
+
+				<!-- 3rd column -->
+				<div class="c3">
+					<h2 class="title">
+						<i class="icon-envelope-alt"></i> Contact
+					</h2>
+					<hr class="footerstress">
+					<dl>
+						<dt>Stefan Plazic, Vladimir Gajcin i Srbislav Stojic</dt>
+						<dd>E-mail: guide@gmail.com</dd>
+					</dl>
+
+				</div>
+
+				<!-- end 4th column -->
+			</div>
+		</div>
+	</div>
+	<!-- copyright area -->
+	<div class="copyright">
+		<div class="grid">
+			<div class="row">
+				<div class="c6">Your Name &copy; 2015. All Rights Reserved.</div>
+				<div class="c6">
+					<span class="right"> Premium Template by WowThemesNet </span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- END CONTENT AREA -->
+	<!-- JAVASCRIPTS
+================================================== -->
+
+
+	<!-- menu & scroll to top -->
+	<script src="../js/common.js"></script>
+
+	<script src="../js/logout.js"></script>
+	<script src="../js/jquery.cookie.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -77,6 +77,7 @@
 					var celE = document.createElement('TD');
 					var celD = document.createElement('TD');
 					var celT = document.createElement('TD');
+					var celCo = document.createElement('TD');
 					
 					var buttonU = document.createElement('BUTTON');
 					buttonU.appendChild(document.createTextNode('Unsubscribe'));
@@ -93,6 +94,30 @@
 			  			    });
 
 						};
+
+						//cooment box
+				
+						
+						var commBox = document.createElement("INPUT");
+						commBox.setAttribute("type", "text");
+						commBox.id = "comBox"+item.id;
+						//comment button
+						var buttonCo = document.createElement('BUTTON');
+						buttonCo.appendChild(document.createTextNode('Comment'));
+						
+						buttonCo.onclick = function(){
+							var comment = {"content": $("#comBox"+item.id).val()};
+							//ajax call
+							$.ajax({
+				  				url: "http://localhost:8080/api/user/postComment/"+item.id,
+				  				type: 'POST',
+				  				headers: {"Authorization": localStorage.jwt},
+				  				data: JSON.stringify(comment),
+				  			    contentType: "application/json",
+				  			    success: function(data){location.reload();}
+				  			    });
+
+							};
 					
 					celU.appendChild(document.createTextNode(item.name));
 					celB.appendChild(document.createTextNode(item.bgDate));
@@ -102,13 +127,17 @@
 					if(item.active){
 						celT.appendChild(buttonU);
 						}
-					
 
+					
+					celCo.appendChild(commBox);
+					celCo.appendChild(buttonCo);
+
+					
 					//append to row
 					row.appendChild(celU);
 					row.appendChild(celB);
 					row.appendChild(celS);
-					
+					row.appendChild(celCo);
 					row.appendChild(celT);
 					
 					//append row to table
@@ -173,7 +202,19 @@
 							searchD.appendChild(document.createElement("hr"));
 							});
 
-						if(item.active){
+						//comments
+						$.each(item.comments,function(i,co){
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Date:" + co.publicationDate)));
+							searchD.appendChild(document.createElement("br"));
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("Content:" + co.content)));
+							searchD.appendChild(document.createElement("br"));
+							searchD.appendChild(document.createElement("P").appendChild(document.createTextNode("User:" + co.user.username)));
+							searchD.appendChild(document.createElement("br"));
+							searchD.appendChild(document.createElement("hr"));
+						
+							});
+						
+						if(item.active && !(item.isApp)){
 								var dugme = document.createElement("BUTTON");
 								dugme.appendChild(document.createTextNode("Subsribe"));
 								dugme.onclick = function(){

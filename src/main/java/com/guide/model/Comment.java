@@ -21,6 +21,9 @@ public class Comment {
 
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private Person person;
+	
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	private Tour tour;
 
 	public Comment() {
 
@@ -56,6 +59,14 @@ public class Comment {
 
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	public Tour getTour() {
+		return tour;
+	}
+
+	public void setTour(Tour tour) {
+		this.tour = tour;
 	}
 
 }
