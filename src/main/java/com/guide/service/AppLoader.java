@@ -19,7 +19,6 @@ public class AppLoader implements ApplicationRunner {
 		this.rep = rep;
 	}
 
-	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		if (rep.findAll().size() == 0) {
 			// if there is no admin in database insert one
