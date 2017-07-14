@@ -1,9 +1,11 @@
 package com.guide.controller.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.Charset;
@@ -144,10 +146,14 @@ public class GuideControllerTest {
 			e.setGuide(g);
 			eventService.save(e);// save event
 		}
+		
+		//get number of events
+		int size = eventService.findByGuide(g).size();
 
 		// test controller
 		mockMvc.perform(get(URL_PREFIX + "/viewEvents").principal(new UserPrincipal(g.getUsername())))
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$",hasSize(size)));;
 
 	}
 
@@ -180,10 +186,14 @@ public class GuideControllerTest {
 			e.setGuide(g);
 			eventService.save(e);// save event
 		}
+		
+		int previusSize = eventService.findAll().size();
 
 		// test controller
 		mockMvc.perform(delete(URL_PREFIX + "/deleteEvent/"+e.getId()).principal(new UserPrincipal(g.getUsername())))
 				.andExpect(status().isOk());
+		
+		assertThat(eventService.findAll()).hasSize(previusSize - 1);
 
 	}
 

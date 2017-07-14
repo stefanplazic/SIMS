@@ -146,8 +146,8 @@ public class UserControllerTest {
 		
 
 		
-
-		u.setPass("new pas");
+		String newPass = "new pas";
+		u.setPass(newPass);
 		String json = TestUtil.json(u);
 
 		mockMvc.perform(post(URL_PREFIX + "/edit").contentType(contentType).content(json)
@@ -155,6 +155,6 @@ public class UserControllerTest {
 
 		
 		u = userService.findOne(id);
-		assertThat(u.getPass().equals(oldPas));
+		assertThat(u.getPass().equals(newPass));
 	}
 }
